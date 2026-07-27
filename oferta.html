@@ -1,0 +1,1970 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LegitAlmaz — App de Sensibilidade Free Fire</title>
+  <meta name="description" content="App LegitAlmaz — calibração personalizada de sensibilidade e giroscópio para Free Fire, sob medida pro seu aparelho. Acesso imediato.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #070303;
+      --bg-card: rgba(10, 5, 5, 0.85);
+      --bg-card-solid: #0c0505;
+      --text: #f0f0f0;
+      --text-secondary: #aaaaaa;
+      --text-muted: #666666;
+      --accent: #e11d48;
+      --accent-dark: #be123c;
+      --accent-light: #fb7185;
+      --accent-soft: rgba(225, 29, 72, 0.1);
+      --accent-glow: 0 0 35px rgba(225, 29, 72, 0.4);
+      --accent-glow-lg: 0 0 70px rgba(225, 29, 72, 0.2);
+      --gold: #f59e0b;
+      --border: rgba(225, 29, 72, 0.2);
+      --border-subtle: rgba(255, 255, 255, 0.05);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(225,29,72,0.1) 0%, transparent 50%),
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 40px 40px, 40px 40px;
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, .section-title {
+      font-family: 'Oswald', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(220,38,38,0.3); border-radius: 3px; }
+
+    /* ===== STICKY BAR ===== */
+    .sticky-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      background: rgba(7,3,3,0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(225,29,72,0.2);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transform: translateY(-100%);
+      transition: transform 0.35s ease;
+    }
+
+    .sticky-bar.show { transform: translateY(0); }
+
+    .sticky-bar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .sticky-bar-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(225,29,72,0.4);
+      flex: 0 0 auto;
+    }
+
+    .sticky-bar-name {
+      font-weight: 800;
+      font-size: 15px;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sticky-bar-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      font-family: 'Oswald', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #fff;
+      background: linear-gradient(135deg, #e11d48 0%, #9f1239 100%);
+      border-radius: 8px;
+      text-decoration: none;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+
+    /* ===== SECTION WAVE DIVIDER ===== */
+    .wave-divider {
+      display: block;
+      width: 100%;
+      height: 60px;
+      margin-top: -1px;
+    }
+
+    /* ===== CONTAINER ===== */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ===== PARTICLES ===== */
+    .particles {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0;
+      animation: particleFloat linear infinite;
+    }
+
+    @keyframes particleFloat {
+      0% { opacity: 0; transform: translateY(100vh) scale(0); }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.6; }
+      100% { opacity: 0; transform: translateY(-10vh) scale(1); }
+    }
+
+    /* ===== SECTION ===== */
+    .section {
+      position: relative;
+      z-index: 1;
+      padding: 80px 0;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(36px, 6vw, 52px);
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: 0.01em;
+      color: #fff;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 18px;
+      max-width: 600px;
+      margin: 0 auto 50px;
+    }
+
+    /* ===== REVEAL ANIMATION ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 24px 60px;
+      position: relative;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at center, rgba(225,29,72,0.15) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-logo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      box-shadow: var(--accent-glow);
+      margin-bottom: 30px;
+      object-fit: cover;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 8vw, 72px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: 0.01em;
+      max-width: 900px;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+      color: #fff;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #fff 20%, #e11d48 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: clamp(17px, 3vw, 24px);
+      color: var(--text-secondary);
+      max-width: 700px;
+      margin-bottom: 40px;
+      font-weight: 500;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== CTA BUTTON ===== */
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 24px 50px;
+      font-size: 22px;
+      font-weight: 800;
+      font-family: 'Oswald', sans-serif;
+      text-transform: uppercase;
+      color: #fff;
+      background: linear-gradient(135deg, #e11d48 0%, #9f1239 100%);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 40px rgba(225,29,72,0.4), inset 0 2px 0 rgba(255,255,255,0.2);
+      animation: ctaPulse 2s infinite;
+      position: relative;
+      z-index: 1;
+      letter-spacing: 0.05em;
+    }
+
+    @keyframes ctaPulse {
+      0%, 100% { box-shadow: 0 10px 40px rgba(225,29,72,0.4), inset 0 2px 0 rgba(255,255,255,0.2); transform: scale(1); }
+      50% { box-shadow: 0 15px 50px rgba(225,29,72,0.6), inset 0 2px 0 rgba(255,255,255,0.2); transform: scale(1.02); }
+    }
+
+    .cta-btn:hover {
+      background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
+    }
+
+    .cta-secure {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+      color: var(--text-muted);
+      font-size: 15px;
+      position: relative;
+      z-index: 1;
+      font-weight: 500;
+    }
+
+    .cta-secure svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ===== VIDEO SECTION ===== */
+    .video-section {
+      background: linear-gradient(180deg, var(--bg) 0%, #0a0505 50%, var(--bg) 100%);
+    }
+
+    .video-wrapper {
+      max-width: 1000px;
+      margin: 0 auto 30px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: var(--accent-glow-lg);
+      position: relative;
+      padding: 46.23% 0 0 0;
+      cursor: pointer;
+    }
+
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .vsl-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      backdrop-filter: blur(4px);
+      cursor: pointer;
+      transition: opacity 0.3s;
+    }
+
+    .vsl-overlay-content {
+      text-align: center;
+      padding: 30px;
+      animation: pulseText 2.5s infinite;
+    }
+
+    @keyframes pulseText {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .vsl-overlay svg.pulse-icon {
+      width: 48px;
+      height: 48px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      margin-bottom: 16px;
+      animation: soundPulse 1.5s infinite;
+    }
+
+    @keyframes soundPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.1); }
+    }
+
+    .vsl-overlay-text {
+      color: #fff;
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .vsl-overlay-content { padding: 20px 24px; }
+      .vsl-overlay-text { font-size: 18px; }
+      .vsl-overlay svg.pulse-icon { width: 36px; height: 36px; }
+    }
+
+    .vsl-overlay-sub {
+      color: var(--accent-light);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .vsl-hitbox {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      cursor: pointer;
+      display: none;
+    }
+
+    .video-counter {
+      text-align: center;
+      color: var(--accent-light);
+      font-weight: 700;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .counter-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: counterPulse 1.5s infinite;
+    }
+
+    @keyframes counterPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ===== QUIZ ===== */
+    .mockup-section {
+      background: linear-gradient(180deg, var(--bg) 0%, #0a0505 50%, var(--bg) 100%);
+    }
+
+    .quiz-card {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      background: linear-gradient(160deg, #141010 0%, #0a0707 100%);
+      border: 1px solid rgba(225,29,72,0.25);
+      border-radius: 24px;
+      padding: 32px 30px;
+      box-shadow: 0 30px 70px rgba(0,0,0,0.6), var(--accent-glow-lg);
+    }
+
+    .quiz-progress {
+      width: 100%;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+      margin-bottom: 26px;
+    }
+
+    .quiz-progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent-dark), var(--accent-light));
+      transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .quiz-step {
+      display: none;
+      animation: quizStepIn 0.4s ease;
+    }
+
+    .quiz-step.active {
+      display: block;
+    }
+
+    @keyframes quizStepIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .quiz-question {
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .quiz-option {
+      appearance: none;
+      width: 100%;
+      padding: 16px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--text);
+      background: rgba(225,29,72,0.06);
+      border: 1.5px solid rgba(225,29,72,0.2);
+      border-radius: 14px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.25s ease;
+    }
+
+    .quiz-option:hover {
+      background: rgba(225,29,72,0.14);
+      border-color: rgba(225,29,72,0.4);
+      transform: translateY(-2px);
+    }
+
+    .quiz-option.selected {
+      background: rgba(225,29,72,0.22);
+      border-color: var(--accent);
+    }
+
+    .quiz-result {
+      text-align: center;
+    }
+
+    .quiz-result-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: rgba(245,158,11,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold);
+    }
+
+    .quiz-result-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .quiz-result-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .quiz-result-text {
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .quiz-result .cta-btn {
+      animation: none;
+      padding: 16px 32px;
+      font-size: 16px;
+    }
+
+    .quiz-bot-row {
+      display: none;
+      align-items: flex-end;
+      gap: 10px;
+      text-align: left;
+      margin: 22px 0;
+    }
+
+    .quiz-bot-row.show {
+      display: flex;
+    }
+
+    .quiz-bot-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid rgba(225,29,72,0.35);
+      flex: 0 0 auto;
+    }
+
+    .quiz-bot-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .quiz-bot-bubble {
+      background: linear-gradient(135deg, #16110f 0%, #1a1414 100%);
+      border: 1px solid rgba(225,29,72,0.15);
+      border-radius: 20px;
+      padding: 14px 18px;
+      max-width: 320px;
+      color: #e8e8e8;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .quiz-bot-typing {
+      display: flex;
+      gap: 6px;
+      padding: 4px 2px;
+    }
+
+    .quiz-bot-typing .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #666;
+      animation: quizBlink 1.4s infinite both;
+    }
+
+    .quiz-bot-typing .dot:nth-child(2) { animation-delay: .2s; }
+    .quiz-bot-typing .dot:nth-child(3) { animation-delay: .4s; }
+
+    @keyframes quizBlink {
+      0% { opacity: .25; transform: translateY(0); }
+      20% { opacity: 1; transform: translateY(-1px); }
+      100% { opacity: .25; transform: translateY(0); }
+    }
+
+    .quiz-unlock {
+      opacity: 0;
+      transform: translateY(12px) scale(0.96);
+      transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .quiz-unlock.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .quiz-unlock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(245,158,11,0.12);
+      border: 1px solid rgba(245,158,11,0.35);
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    .quiz-unlock-badge svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    /* ===== FEATURES ===== */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 20px;
+      padding: 36px 30px;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(220,38,38,0.3);
+      box-shadow: 0 12px 40px rgba(220,38,38,0.1);
+    }
+
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: rgba(225,29,72,0.1);
+      box-shadow: inset 0 0 0 1px rgba(225,29,72,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .feature-card:hover .feature-icon {
+      transform: translateY(-3px) rotate(-4deg);
+      background: rgba(225,29,72,0.18);
+    }
+
+    .feature-icon svg {
+      width: 26px;
+      height: 26px;
+      stroke: var(--accent-light);
+      fill: none;
+    }
+
+    .feature-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .feature-desc {
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ===== SOCIAL PROOF ===== */
+    .testimonials-section {
+      background: linear-gradient(180deg, var(--bg) 0%, #080303 50%, var(--bg) 100%);
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .testimonial-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 32px 28px;
+      transition: all 0.3s ease;
+    }
+
+    .testimonial-card:hover {
+      border-color: var(--border);
+      transform: translateY(-2px);
+    }
+
+    .testimonial-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .testimonial-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #150808;
+      border: 1px solid rgba(225,29,72,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .testimonial-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .testimonial-name {
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .testimonial-stars {
+      color: var(--gold);
+      font-size: 14px;
+      letter-spacing: 2px;
+    }
+
+    .testimonial-text {
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.7;
+      font-style: italic;
+    }
+
+    /* ===== STEPS ===== */
+    .steps-section {
+      background: linear-gradient(180deg, var(--bg) 0%, #080303 50%, var(--bg) 100%);
+    }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 40px;
+    }
+    .step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 24px;
+      text-align: center;
+      position: relative;
+    }
+    .step-number {
+      width: 48px;
+      height: 48px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 24px;
+      font-weight: 900;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: var(--accent-glow);
+      animation: stepPulse 2.4s ease-in-out infinite;
+    }
+    .step-card:nth-child(2) .step-number { animation-delay: 0.3s; }
+    .step-card:nth-child(3) .step-number { animation-delay: 0.6s; }
+    @keyframes stepPulse {
+      0%, 100% { box-shadow: var(--accent-glow); transform: scale(1); }
+      50% { box-shadow: 0 0 30px rgba(225,29,72,0.65); transform: scale(1.06); }
+    }
+    .step-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+    .step-desc {
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ===== FIT SECTION ===== */
+    .fit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .fit-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 32px 28px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .fit-card.yes {
+      border: 1px solid rgba(34,197,94,0.25);
+    }
+
+    .fit-card.no {
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .fit-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      color: #fff;
+    }
+
+    .fit-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .fit-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .fit-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+
+    .fit-card.yes .fit-icon {
+      background: rgba(34,197,94,0.15);
+      color: #22c55e;
+    }
+
+    .fit-card.no .fit-icon {
+      background: rgba(255,255,255,0.08);
+      color: var(--text-muted);
+    }
+
+    .fit-icon svg { width: 12px; height: 12px; }
+
+    /* ===== PRICING ===== */
+    .pricing-section {
+      background: linear-gradient(180deg, var(--bg) 0%, #0a0303 50%, var(--bg) 100%);
+    }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .pricing-card {
+      background: linear-gradient(145deg, #110505 0%, #050202 100%);
+      border: 1px solid rgba(225,29,72,0.3);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      transition: all 0.3s ease;
+    }
+    .pricing-card:hover {
+      border-color: rgba(225,29,72,0.6);
+      box-shadow: 0 15px 40px rgba(225,29,72,0.2);
+    }
+    .pricing-card.premium {
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 50px rgba(225,29,72,0.2), inset 0 0 20px rgba(225,29,72,0.1);
+      transform: scale(1.05);
+      z-index: 2;
+    }
+    @media (max-width: 768px) {
+      .pricing-card.premium { transform: scale(1); }
+    }
+    .pricing-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, rgba(225,29,72,0.5), transparent);
+    }
+    .pricing-card.premium::before {
+      background: linear-gradient(90deg, #ff003c, #ff4d4d, #ff003c);
+      height: 6px;
+      box-shadow: 0 0 20px #ff003c;
+    }
+    .pricing-badge {
+      text-align: center;
+      padding: 12px;
+      background: rgba(225,29,72,0.1);
+      font-weight: 800;
+      font-size: 16px;
+      font-family: 'Oswald', sans-serif;
+      color: var(--accent-light);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(225,29,72,0.2);
+    }
+    .pricing-card.premium .pricing-badge {
+      background: linear-gradient(90deg, #9f1239, #e11d48, #9f1239);
+      color: #fff;
+      animation: badgePulse 2s infinite;
+      border-bottom: none;
+      position: relative;
+      overflow: hidden;
+    }
+    @keyframes badgePulse {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.3); }
+    }
+    .pricing-card.premium .pricing-badge::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -60%;
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+      animation: shimmerSweep 2.8s ease-in-out infinite;
+    }
+    @keyframes shimmerSweep {
+      0% { left: -60%; }
+      55%, 100% { left: 130%; }
+    }
+    .pricing-body {
+      padding: 40px 30px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .pricing-product {
+      text-align: center;
+      font-size: 28px;
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      color: #fff;
+      letter-spacing: 0.02em;
+    }
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 32px;
+      flex-grow: 1;
+    }
+    .pricing-features li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      font-size: 14px;
+      color: #ccc;
+      font-weight: 500;
+    }
+    .pricing-features li.bonus {
+      color: #fbbf24;
+      font-weight: 700;
+      text-shadow: 0 0 10px rgba(251,191,36,0.3);
+    }
+    .pricing-features li.bonus .pricing-check {
+      background: rgba(251,191,36,0.2);
+      border-color: rgba(251,191,36,0.5);
+    }
+    .pricing-features li.bonus .pricing-check svg {
+      stroke: #fbbf24;
+    }
+    .pricing-check {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      background: rgba(225,29,72,0.15);
+      border: 1px solid rgba(225,29,72,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transform: rotate(45deg);
+    }
+    .pricing-check svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--accent-light);
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transform: rotate(-45deg);
+    }
+    .pricing-prices {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .price-current {
+      font-size: 56px;
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      text-shadow: 0 0 20px rgba(225,29,72,0.3);
+    }
+    .price-current span {
+      font-size: 24px;
+      color: var(--accent-light);
+    }
+    .pricing-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 20px;
+      font-size: 20px;
+      font-family: 'Oswald', sans-serif;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(225,29,72,0.1);
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.3s ease;
+      margin-bottom: 16px;
+      letter-spacing: 0.05em;
+    }
+
+    .cta-btn-logo, .pricing-cta-logo {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex: 0 0 auto;
+    }
+    .pricing-cta:hover {
+      background: rgba(225,29,72,0.2);
+    }
+    .pricing-card.premium .pricing-cta {
+      background: linear-gradient(135deg, #e11d48, #9f1239);
+      border: 1px solid #ff4d4d;
+      box-shadow: 0 10px 30px rgba(225,29,72,0.5), inset 0 0 15px rgba(255,255,255,0.2);
+      animation: ctaPulse 2s infinite;
+    }
+    .pricing-card.premium .pricing-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(225,29,72,0.7), inset 0 0 15px rgba(255,255,255,0.2);
+    }
+    .payment-methods {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .payment-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .payment-chip svg {
+      width: 13px;
+      height: 13px;
+      flex: 0 0 auto;
+    }
+
+    /* ===== BIG GUARANTEE ===== */
+    .mega-guarantee {
+      background: linear-gradient(135deg, #141210, #0a0806);
+      border: 1px solid rgba(245,158,11,0.25);
+      border-radius: 24px;
+      padding: 40px;
+      margin: 60px auto 0;
+      max-width: 800px;
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      box-shadow: 0 0 60px rgba(245,158,11,0.1);
+    }
+    @media (max-width: 768px) {
+      .mega-guarantee {
+        flex-direction: column;
+        text-align: center;
+        padding: 30px 20px;
+      }
+    }
+    .mega-guarantee-icon {
+      width: 100px;
+      height: 100px;
+      flex-shrink: 0;
+      color: var(--gold);
+      filter: drop-shadow(0 0 20px rgba(245,158,11,0.35));
+    }
+    .mega-guarantee-content h3 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+    .mega-guarantee-content p {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ===== FAQ ===== */
+    .faq-list {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      background: var(--bg-card);
+      transition: border-color 0.3s;
+    }
+
+    .faq-item.active {
+      border-color: var(--border);
+    }
+
+    .faq-question {
+      width: 100%;
+      padding: 22px 24px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 17px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      text-align: left;
+      transition: color 0.3s;
+    }
+
+    .faq-question:hover {
+      color: var(--accent-light);
+    }
+
+    .faq-arrow {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      transition: transform 0.3s;
+      color: var(--text-muted);
+    }
+
+    .faq-item.active .faq-arrow {
+      transform: rotate(180deg);
+      color: var(--accent);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .faq-answer-inner {
+      padding: 0 24px 22px;
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* ===== FINAL CTA ===== */
+    .final-cta {
+      text-align: center;
+      padding: 100px 24px;
+      background: linear-gradient(180deg, var(--bg), #0a0303, var(--bg));
+      position: relative;
+    }
+
+    .final-cta::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(220,38,38,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .final-cta h2 {
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 800;
+      max-width: 600px;
+      margin: 0 auto 32px;
+      letter-spacing: -0.02em;
+      position: relative;
+      z-index: 1;
+    }
+
+    .final-cta .cta-btn {
+      position: relative;
+      z-index: 1;
+    }
+
+    .final-cta .instant-access {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+      color: var(--text-muted);
+      font-size: 15px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      text-align: center;
+      padding: 40px 24px;
+      border-top: 1px solid rgba(255,255,255,0.03);
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .footer-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      object-fit: cover;
+      opacity: 0.6;
+    }
+
+    .footer p {
+      margin-bottom: 6px;
+    }
+
+    .footer-links {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent-light);
+      text-decoration: underline;
+    }
+
+    .footer-links span {
+      color: var(--text-muted);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .section { padding: 60px 0; }
+      .section-subtitle { font-size: 16px; }
+      .features-grid { grid-template-columns: 1fr; gap: 16px; }
+      .testimonials-grid { grid-template-columns: 1fr; gap: 16px; }
+      .feature-card { padding: 28px 22px; }
+      .testimonial-card { padding: 24px 20px; }
+      .pricing-body { padding: 32px 24px; }
+      .price-current { font-size: 42px; }
+      .hero-logo { width: 100px; height: 100px; }
+      .cta-btn { padding: 18px 36px; font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sticky-bar" id="stickyBar">
+    <div class="sticky-bar-brand">
+      <img src="images/logo.png" alt="LegitAlmaz" class="sticky-bar-logo">
+      <span class="sticky-bar-name">LegitAlmaz</span>
+    </div>
+    <a href="#preco" class="sticky-bar-cta">Garantir Agora</a>
+  </div>
+
+  <!-- Particles Background -->
+  <div class="particles" id="particles"></div>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="hero">
+    <img src="images/logo.png" alt="LegitAlmaz" class="hero-logo">
+    <h1>O MELHOR <span class="gradient-text">XIT MOBILE</span> PARA O SEU FREE FIRE</h1>
+    <p class="hero-sub">Desenvolvemos o Xit Mobile perfeito para você usar em apostado e na ranqueada. Totalmente ajustável para puxar na cabeça mais forte ou mais fraco se quiser disfarçar.</p>
+    <a href="#preco" class="cta-btn"><img src="images/logo.png" alt="" class="cta-btn-logo">GARANTIR MEU XIT MOBILE</a>
+    <div class="cta-secure">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      <span>Compra Segura | Entrega Imediata</span>
+    </div>
+  </section>
+
+  <div class="wave-divider">
+    <svg viewBox="0 0 1200 60" preserveAspectRatio="none" style="width:100%;height:100%;">
+      <path d="M0,30 C300,65 900,-5 1200,30 L1200,60 L0,60 Z" fill="#0a0505"></path>
+    </svg>
+  </div>
+
+  <!-- ===== VIDEO ===== -->
+  <section class="section video-section" id="video">
+    <div class="container">
+      <h2 class="section-title reveal">Veja o Xit em Ação</h2>
+      <p class="section-subtitle reveal">Assista ao Xit Mobile em ação na minha conta com primeiro passe</p>
+      <div class="video-wrapper reveal" id="vsl-container">
+        <iframe id="vimeo-vsl" src="https://player.vimeo.com/video/1153794946?badge=0&amp;autopause=0&amp;player_id=vimeo-vsl&amp;app_id=58479&amp;controls=0&amp;muted=1&amp;autoplay=1&amp;title=0&amp;byline=0&amp;portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" title="VEJA COMO CALIBRAR SUA SENSIBILIDADE EM MINUTOS"></iframe>
+        
+        <!-- Overlay de Áudio -->
+        <div id="vsl-overlay" class="vsl-overlay">
+          <div class="vsl-overlay-content">
+            <svg viewBox="0 0 24 24" class="pulse-icon"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            <div class="vsl-overlay-text">SEU VÍDEO JÁ COMEÇOU!</div>
+            <div class="vsl-overlay-sub">Clique aqui para ativar o som e assistir desde o início</div>
+          </div>
+        </div>
+        
+        <!-- Hitbox para Pause/Play pós ativação -->
+        <div id="vsl-hitbox" class="vsl-hitbox"></div>
+      </div>
+      <script src="https://player.vimeo.com/api/player.js"></script>
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const iframe = document.querySelector('#vimeo-vsl');
+          if(iframe && window.Vimeo) {
+            const player = new Vimeo.Player(iframe);
+            const overlay = document.getElementById('vsl-overlay');
+            const hitbox = document.getElementById('vsl-hitbox');
+            let hasStarted = false;
+
+            overlay.addEventListener('click', () => {
+              player.setVolume(1).catch(() => {});
+              
+              player.setCurrentTime(0).then(() => {
+                player.play();
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                  overlay.style.display = 'none';
+                  hitbox.style.display = 'block';
+                  hasStarted = true;
+                }, 300);
+              }).catch(err => {
+                console.error("Erro ao reiniciar vídeo:", err);
+              });
+            });
+
+            hitbox.addEventListener('click', () => {
+              if(!hasStarted) return;
+              player.getPaused().then(paused => {
+                if (paused) {
+                  player.play();
+                } else {
+                  player.pause();
+                }
+              });
+            });
+
+            player.on('ended', function() {
+              hasStarted = false;
+              hitbox.style.display = 'none';
+              overlay.querySelector('.vsl-overlay-text').textContent = 'REASSISTIR VÍDEO';
+              overlay.querySelector('.vsl-overlay-sub').textContent = 'Clique aqui para assistir novamente sem perder detalhes';
+              overlay.style.display = 'flex';
+              
+              // Pequeno delay para garantir que a opacidade suba suave e cubra a tela de recomendados
+              setTimeout(() => {
+                overlay.style.opacity = '1';
+              }, 50);
+            });
+          }
+        });
+      </script>
+      <div class="video-counter reveal" style="margin-top: 20px;">
+        <span class="counter-dot"></span>
+        <span>Xit ajustável, puxe na cabeça e domine o jogo</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QUIZ ===== -->
+  <section class="section mockup-section" id="mockup">
+    <div class="container">
+      <h2 class="section-title reveal">O Xit é Para Você?</h2>
+      <p class="section-subtitle reveal">Responda 3 perguntas rápidas e veja se o Xit Mobile faz sentido pro teu jogo</p>
+      <div class="quiz-card reveal">
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="quizProgressFill"></div></div>
+        <div class="quiz-step active" data-step="1">
+          <div class="quiz-question">Qual modo você mais joga?</div>
+          <div class="quiz-options">
+            <button class="quiz-option" data-q="1" data-a="ranqueada">Ranqueada</button>
+            <button class="quiz-option" data-q="1" data-a="apostado">Apostado</button>
+            <button class="quiz-option" data-q="1" data-a="ambos">Os dois</button>
+          </div>
+        </div>
+        <div class="quiz-step" data-step="2">
+          <div class="quiz-question">Sua puxada de capa atual...</div>
+          <div class="quiz-options">
+            <button class="quiz-option" data-q="2" data-a="foge">Não sobe capa fácil, trava muito</button>
+            <button class="quiz-option" data-q="2" data-a="ok">Tá ok, mas podia ser melhor</button>
+            <button class="quiz-option" data-q="2" data-a="perfeita">Já subo capa toda hora</button>
+          </div>
+        </div>
+        <div class="quiz-step" data-step="3">
+          <div class="quiz-question">Você gostaria de poder ajustar a força da puxada para disfarçar?</div>
+          <div class="quiz-options">
+            <button class="quiz-option" data-q="3" data-a="diferente">Sim, muito</button>
+            <button class="quiz-option" data-q="3" data-a="naosei">Não ligo pra isso</button>
+            <button class="quiz-option" data-q="3" data-a="igual">Não, prefiro full</button>
+          </div>
+        </div>
+        <div class="quiz-step quiz-result" data-step="4">
+          <div class="quiz-result-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <div class="quiz-result-title" id="quizResultTitle">Resultado</div>
+          <p class="quiz-result-text" id="quizResultText"></p>
+
+          <div class="quiz-bot-row" id="quizBotRow">
+            <div class="quiz-bot-avatar"><img src="images/logo.png" alt="LegitAlmaz"></div>
+            <div class="quiz-bot-bubble">
+              <div class="quiz-bot-typing" id="quizBotTyping"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+              <span class="quiz-bot-text" id="quizBotText" style="display:none;"></span>
+            </div>
+          </div>
+
+          <div class="quiz-unlock" id="quizUnlock">
+            <div class="quiz-unlock-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M7 11V8a5 5 0 019.6-2"/></svg>
+              DESCONTO LIBERADO
+            </div>
+            <div>
+              <a href="#preco" class="cta-btn"><img src="images/logo.png" alt="" class="cta-btn-logo">GARANTIR COM DESCONTO</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES ===== -->
+  <section class="section" id="funcoes">
+    <div class="container">
+      <h2 class="section-title reveal">Por Que o LegitAlmaz é Diferente?</h2>
+      <p class="section-subtitle reveal">Desenvolvemos o Xit Mobile mais completo e seguro do mercado, com várias funções exclusivas</p>
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <span class="feature-icon"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg></span>
+          <h3 class="feature-title">Puxada Ajustável</h3>
+          <p class="feature-desc">Configure para puxar na cabeça mais forte, ou mais fraco caso você queira disfarçar no apostado.</p>
+        </div>
+        <div class="feature-card reveal">
+          <span class="feature-icon"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>
+          <h3 class="feature-title">Para Apostado e Ranqueada</h3>
+          <p class="feature-desc">Você pode jogar tranquilo em partidas ranqueadas ou valendo grana nos apostados.</p>
+        </div>
+        <div class="feature-card reveal">
+          <span class="feature-icon"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></span>
+          <h3 class="feature-title">Atualização Anti-Ban</h3>
+          <p class="feature-desc">Sempre atualizado para as novas versões do Free Fire, garantindo a segurança total da sua conta.</p>
+        </div>
+        <div class="feature-card reveal">
+          <span class="feature-icon"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.6"/><ellipse cx="12" cy="12" rx="9.5" ry="4.2" transform="rotate(30 12 12)"/><ellipse cx="12" cy="12" rx="9.5" ry="4.2" transform="rotate(-30 12 12)"/></svg></span>
+          <h3 class="feature-title">Muito mais Capas</h3>
+          <p class="feature-desc">Diferença nítida na puxada de mira, aumentando absurdamente a sua taxa de HS.</p>
+        </div>
+        <div class="feature-card reveal">
+          <span class="feature-icon"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2" ry="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg></span>
+          <h3 class="feature-title">Funciona em Qualquer Android</h3>
+          <p class="feature-desc">Não importa se você usa Samsung, Xiaomi ou Motorola, o painel vai funcionar perfeitamente.</p>
+        </div>
+        <div class="feature-card reveal">
+          <span class="feature-icon"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></span>
+          <h3 class="feature-title">Suporte no Discord</h3>
+          <p class="feature-desc">Time de suporte pronto pra te ajudar a ativar as funções e tirar qualquer dúvida que você tenha.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TESTIMONIALS ===== -->
+  <section class="section testimonials-section" id="depoimentos">
+    <div class="container">
+      <h2 class="section-title reveal">O Que Muda no Seu Jogo</h2>
+      <p class="section-subtitle reveal">Relatos de quem já está amassando com o Xit Mobile LegitAlmaz</p>
+      <div class="testimonials-grid">
+        <div class="testimonial-card reveal">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar"><img src="images/logo.png" alt="LegitAlmaz"></div>
+            <div>
+              <div class="testimonial-name">Jogador de Ranqueada</div>
+            </div>
+          </div>
+          <p class="testimonial-text">"O Xit é muito brabo, jogo ranqueada o dia todo e a puxada na cabeça tá absurda. Minha taxa subiu pra 80%."</p>
+        </div>
+        <div class="testimonial-card reveal">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar"><img src="images/logo.png" alt="LegitAlmaz"></div>
+            <div>
+              <div class="testimonial-name">Jogador de Apostado</div>
+            </div>
+          </div>
+          <p class="testimonial-text">"Uso a configuração de puxar mais fraco pra disfarçar no apostado. Os caras nem desconfiam e eu levo todas as salas."</p>
+        </div>
+        <div class="testimonial-card reveal">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar"><img src="images/logo.png" alt="LegitAlmaz"></div>
+            <div>
+              <div class="testimonial-name">Jogador Android</div>
+            </div>
+          </div>
+          <p class="testimonial-text">"A diferença é nítida. Você vira outro jogador. Muito top poder regular a força da puxada direto no painel."</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COMO INSTALAR ===== -->
+  <section class="section steps-section" id="passos">
+    <div class="container">
+      <h2 class="section-title reveal">ATIVE O XIT EM 3 PASSOS</h2>
+      <p class="section-subtitle reveal">Desenhamos um processo sem enrolação: comprar, instalar e amassar.</p>
+      <div class="steps-grid">
+        <div class="step-card reveal">
+          <div class="step-number">1</div>
+          <h3 class="step-title">ACESSO IMEDIATO</h3>
+          <p class="step-desc">Faça o pagamento via PIX e receba o acesso ao painel na mesma hora no seu e-mail.</p>
+        </div>
+        <div class="step-card reveal">
+          <div class="step-number">2</div>
+          <h3 class="step-title">INSTALE O PAINEL</h3>
+          <p class="step-desc">Assista ao tutorial rápido de instalação e libere o painel no seu Android.</p>
+        </div>
+        <div class="step-card reveal">
+          <div class="step-number">3</div>
+          <h3 class="step-title">ATIVE AS FUNÇÕES</h3>
+          <p class="step-desc">Ligue a puxada desejada e sinta a diferença automática nos headshots.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PARA QUEM É ===== -->
+  <section class="section" id="pra-quem">
+    <div class="container">
+      <h2 class="section-title reveal">O Xit é Pra Você?</h2>
+      <p class="section-subtitle reveal">Sem enrolação: veja se faz sentido antes de comprar</p>
+      <div class="fit-grid">
+        <div class="fit-card yes reveal">
+          <div class="fit-title">Faz sentido se você...</div>
+          <ul class="fit-list">
+            <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Quer puxar capa muito mais fácil e aumentar a sua taxa de HS</li>
+            <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Joga apostado e precisa de uma vantagem absurda para dominar as salas</li>
+            <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Quer o poder de ajustar a força da puxada para disfarçar nas partidas</li>
+            <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Procura algo 100% testado, atualizado e totalmente anti-ban</li>
+          </ul>
+        </div>
+        <div class="fit-card no reveal">
+          <div class="fit-title">Não faz sentido se você...</div>
+          <ul class="fit-list">
+            <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Já é um Deus no Free Fire e sobe capa facilmente sem precisar de ajuda</li>
+            <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Joga só de vez em quando e não se importa em perder as partidas e o dinheiro dos apostados</li>
+            <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Acha que não vale investir numa vantagem para garantir as suas vitórias</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRICING ===== -->
+  <section class="section pricing-section" id="preco">
+    <div class="container">
+      <h2 class="section-title reveal">LIBERE SEU ACESSO VIP</h2>
+      <p class="section-subtitle reveal">Escolha o plano do Xit Mobile e comece a amassar agora mesmo.</p>
+      
+      <div class="pricing-grid">
+        <!-- PLANO 30 DIAS -->
+        <div class="pricing-card reveal">
+          <div class="pricing-badge">ACESSO MENSAL</div>
+          <div class="pricing-body">
+            <div class="pricing-product">Acesso de 30 Dias</div>
+
+            <ul class="pricing-features">
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Puxada ajustável (Forte/Fraca)</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Funciona em qualquer Android</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Para Ranqueada e Apostado</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> 100% Anti-Ban e Seguro</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Atualizações de Segurança</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Suporte no Discord</li>
+              <li class="bonus"><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> BÔNUS: Dicas para Disfarçar no Apostado</li>
+            </ul>
+
+            <div class="pricing-prices">
+              <div class="price-current"><span>R$</span> 29,90</div>
+            </div>
+
+            <!-- TROQUE O LINK #checkout-30dias PELO SEU LINK DE PAGAMENTO -->
+            <a href="#checkout-30dias" class="pricing-cta">ASSINAR POR 30 DIAS</a>
+            <div class="payment-methods">
+              <span class="payment-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/></svg> Pix</span>
+              <span class="payment-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Cartão</span>
+              <span class="payment-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="4" x2="4" y2="20"/><line x1="8" y1="4" x2="8" y2="20"/><line x1="11" y1="4" x2="11" y2="20"/><line x1="15" y1="4" x2="15" y2="20"/><line x1="19" y1="4" x2="19" y2="20"/></svg> Boleto</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PLANO PERMANENTE -->
+        <div class="pricing-card premium reveal">
+          <div class="pricing-badge">MAIS VENDIDO</div>
+          <div class="pricing-body">
+            <div class="pricing-product">Acesso Permanente</div>
+
+            <ul class="pricing-features">
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Puxada ajustável (Forte/Fraca)</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Funciona em qualquer Android</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Para Ranqueada e Apostado</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> 100% Anti-Ban e Seguro</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Atualizações de Segurança Vitalícias</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Suporte prioritário no Discord</li>
+              <li class="bonus"><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> BÔNUS: Dicas para Disfarçar no Apostado</li>
+              <li class="bonus"><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> BÔNUS: Configurações VIP para Camp</li>
+            </ul>
+
+            <div class="pricing-prices">
+              <div class="price-original">De R$ 79,90</div>
+              <div class="price-current"><span>R$</span> 49,90</div>
+            </div>
+
+            <!-- TROQUE O LINK #checkout-permanente PELO SEU LINK DE PAGAMENTO -->
+            <a href="#checkout-permanente" class="pricing-cta"><img src="images/logo.png" alt="" class="pricing-cta-logo">GARANTIR ACESSO PERMANENTE</a>
+            <div class="payment-methods">
+              <span class="payment-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/></svg> Pix</span>
+              <span class="payment-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Cartão</span>
+              <span class="payment-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="4" x2="4" y2="20"/><line x1="8" y1="4" x2="8" y2="20"/><line x1="11" y1="4" x2="11" y2="20"/><line x1="15" y1="4" x2="15" y2="20"/><line x1="19" y1="4" x2="19" y2="20"/></svg> Boleto</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GARANTIA GRANDIOSA -->
+      <div class="mega-guarantee reveal">
+        <svg class="mega-guarantee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+        <div class="mega-guarantee-content">
+          <h3>Risco ZERO: 7 Dias de Garantia</h3>
+          <p>A LegitAlmaz garante 100% a segurança e o funcionamento do Xit Mobile. Testamos o painel diariamente antes de liberar pra você usar. Se por qualquer motivo você não sentir diferença absurda na puxada, devolvemos <strong>100% do seu dinheiro</strong>. Sem letras miúdas, sem enrolação.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="section" id="faq">
+    <div class="container">
+      <h2 class="section-title reveal">Perguntas Frequentes</h2>
+      <p class="section-subtitle reveal">Nosso time reuniu as dúvidas mais comuns sobre o app</p>
+      <div class="faq-list">
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            Funciona em qual celular?
+            <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">O app funciona em qualquer celular Android, independente da marca (Samsung, Motorola, Xiaomi, etc). Não funciona em iPhone no momento.</div></div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            É seguro usar?
+            <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">Sim. Nosso painel conta com sistema Anti-Ban integrado e atualizado constantemente. Você pode jogar tranquilo na sua conta principal sem risco de banimento.</div></div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            Como eu ativo o app?
+            <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">Após a compra, liberamos acesso imediato ao painel + um tutorial completo em vídeo mostrando o passo a passo da instalação e como ativar as funções.</div></div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            Funciona na ranqueada e apostado?
+            <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">Sim! O Xit Mobile funciona perfeitamente em qualquer modo. E você ainda pode ajustar a força da puxada para disfarçar no Apostado.</div></div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            E se eu não gostar?
+            <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">Sem problemas! Você tem 7 dias de garantia incondicional. Se não ficar satisfeito, devolvemos 100% do seu dinheiro.</div></div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            O app atualiza sozinho?
+            <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">Sim. Nosso time atualiza o sistema de segurança do painel automaticamente a cada atualização do Free Fire, você não precisa fazer nada, apenas continuar jogando.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wave-divider" style="transform: rotate(180deg);">
+    <svg viewBox="0 0 1200 60" preserveAspectRatio="none" style="width:100%;height:100%;">
+      <path d="M0,30 C300,65 900,-5 1200,30 L1200,60 L0,60 Z" fill="#0a0303"></path>
+    </svg>
+  </div>
+
+  <!-- ===== FINAL CTA ===== -->
+  <section class="final-cta">
+    <h2>Não perca essa oportunidade. Garanta o seu Xit agora com <span class="gradient-text">50% de desconto</span>.</h2>
+    <a href="#preco" class="cta-btn"><img src="images/logo.png" alt="" class="cta-btn-logo">QUERO AMASSAR COM DESCONTO</a>
+    <div class="instant-access">
+      <span>Acesso imediato após a compra</span>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <img src="images/logo.png" alt="LegitAlmaz" class="footer-logo">
+    <p>© 2026 LegitAlmaz. Todos os direitos reservados.</p>
+    <p>Este produto é vendido pela internet através de plataforma segura de pagamento.</p>
+    <!-- TROQUE OS LINKS ABAIXO PELOS SEUS CANAIS REAIS -->
+    <div class="footer-links">
+      <a href="#">Suporte no Discord</a>
+      <span>•</span>
+      <a href="#">Termos de Uso</a>
+      <span>•</span>
+      <a href="#">Política de Privacidade</a>
+    </div>
+  </footer>
+
+  <script>
+    // ===== STICKY BAR =====
+    (function stickyBar() {
+      const bar = document.getElementById('stickyBar');
+      const hero = document.getElementById('hero');
+      if (!bar || !hero) return;
+      const threshold = () => hero.offsetHeight * 0.6;
+      window.addEventListener('scroll', () => {
+        bar.classList.toggle('show', window.scrollY > threshold());
+      }, { passive: true });
+    })();
+
+    // ===== PARTICLES =====
+    (function createParticles() {
+      const container = document.getElementById('particles');
+      const count = window.innerWidth < 768 ? 15 : 30;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDuration = (8 + Math.random() * 12) + 's';
+        p.style.animationDelay = (Math.random() * 10) + 's';
+        p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+        container.appendChild(p);
+      }
+    })();
+
+    // ===== SCROLL REVEAL =====
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, i * 100);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // ===== PERFIL QUIZ =====
+    (function quiz() {
+      const card = document.querySelector('.quiz-card');
+      if (!card) return;
+      const steps = card.querySelectorAll('.quiz-step');
+      const fill = document.getElementById('quizProgressFill');
+      const totalQuestions = 3;
+      const answers = {};
+
+      function goTo(stepNum) {
+        steps.forEach(s => s.classList.remove('active'));
+        card.querySelector(`.quiz-step[data-step="${stepNum}"]`).classList.add('active');
+        fill.style.width = Math.min(100, ((stepNum - 1) / totalQuestions) * 100) + '%';
+      }
+
+      function showResult() {
+        fill.style.width = '100%';
+        steps.forEach(s => s.classList.remove('active'));
+        card.querySelector('.quiz-result').classList.add('active');
+
+        let score = 0;
+        if (answers[2] === 'foge') score += 2;
+        else if (answers[2] === 'ok') score += 1;
+        if (answers[3] === 'diferente') score += 2;
+        else if (answers[3] === 'naosei') score += 1;
+
+        const modeLabel = { ranqueada: 'na Ranqueada', apostado: 'no Apostado', ambos: 'na Ranqueada e no Apostado' }[answers[1]] || 'no Free Fire';
+        const titleEl = document.getElementById('quizResultTitle');
+        const textEl = document.getElementById('quizResultText');
+
+        let botMsg;
+        if (score >= 3) {
+          titleEl.textContent = 'O Xit Mobile é perfeito para você!';
+          textEl.textContent = `Jogando ${modeLabel} com esse cenário, o nosso painel vai transformar totalmente a sua jogabilidade, puxando capa muito mais fácil.`;
+          botMsg = 'Show! Pelo seu perfil, a LegitAlmaz liberou o desconto especial que reservamos pra quem termina o teste.';
+        } else if (score >= 1) {
+          titleEl.textContent = 'Você vai amassar com o Xit Mobile';
+          textEl.textContent = `Pra quem joga ${modeLabel}, vale a pena testar o nosso painel — ainda mais com a garantia de 7 dias caso não sinta diferença.`;
+          botMsg = 'Beleza! Pra você testar sem risco, a LegitAlmaz liberou o desconto especial que reservamos pra quem termina o teste.';
+        } else {
+          titleEl.textContent = 'Sua puxada já parece boa, mas o Xit pode melhorar';
+          textEl.textContent = `Pelo que você respondeu, você já joga bem. Mas com o Xit Mobile, você vai garantir muito mais HS de forma automática. Teste com a garantia de 7 dias sem risco.`;
+          botMsg = 'De qualquer forma, a LegitAlmaz liberou o desconto especial que reservamos pra quem termina o teste, para você testar.';
+        }
+
+        runBotSequence(botMsg);
+      }
+
+      function runBotSequence(message) {
+        const botRow = document.getElementById('quizBotRow');
+        const botTyping = document.getElementById('quizBotTyping');
+        const botText = document.getElementById('quizBotText');
+        const unlock = document.getElementById('quizUnlock');
+
+        setTimeout(() => {
+          botRow.classList.add('show');
+          setTimeout(() => {
+            botTyping.style.display = 'none';
+            botText.style.display = 'block';
+            botText.textContent = message;
+            setTimeout(() => {
+              unlock.classList.add('show');
+            }, 500);
+          }, 1400);
+        }, 900);
+      }
+
+      card.querySelectorAll('.quiz-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const step = parseInt(btn.dataset.q, 10);
+          answers[step] = btn.dataset.a;
+          if (step < totalQuestions) {
+            goTo(step + 1);
+          } else {
+            showResult();
+          }
+        });
+      });
+
+      goTo(1);
+    })();
+
+    // ===== FAQ ACCORDION =====
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.parentElement;
+        const answer = item.querySelector('.faq-answer');
+        const isActive = item.classList.contains('active');
+
+        // Close all
+        document.querySelectorAll('.faq-item').forEach(faq => {
+          faq.classList.remove('active');
+          faq.querySelector('.faq-answer').style.maxHeight = '0';
+        });
+
+        // Open clicked if was closed
+        if (!isActive) {
+          item.classList.add('active');
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+        }
+      });
+    });
+
+    // ===== SMOOTH SCROLL =====
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
