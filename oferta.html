@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>LegitAlmaz — App de Sensibilidade Free Fire</title>
-  <meta name="description" content="App LegitAlmaz — calibração personalizada de sensibilidade e giroscópio para Free Fire, sob medida pro seu aparelho. Acesso imediato.">
+  <meta name="description" content="LegitAlmaz - Xit Mobile Pro">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
@@ -217,15 +217,19 @@
     }
 
     .hero-logo {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: 2px solid var(--accent);
-      box-shadow: var(--accent-glow);
+      width: 140px;
+      height: 140px;
       margin-bottom: 30px;
-      object-fit: cover;
+      object-fit: contain;
       position: relative;
       z-index: 1;
+      filter: drop-shadow(0 0 25px rgba(225,29,72,0.5));
+      animation: heroLogoFloat 3.5s ease-in-out infinite;
+    }
+
+    @keyframes heroLogoFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-14px); }
     }
 
     .hero h1 {
@@ -319,11 +323,21 @@
       margin: 0 auto 30px;
       border-radius: 20px;
       overflow: hidden;
-      border: 1px solid var(--border);
-      box-shadow: var(--accent-glow-lg);
+      border: 1px solid rgba(225,29,72,0.55);
+      box-shadow: 0 0 0 1px rgba(225,29,72,0.15), 0 0 40px rgba(225,29,72,0.25), 0 20px 60px rgba(0,0,0,0.6);
       position: relative;
-      padding: 46.23% 0 0 0;
+      aspect-ratio: 1000 / 462.3;
       cursor: pointer;
+      animation: vslFrameGlow 2.5s ease-in-out infinite;
+    }
+
+    @supports not (aspect-ratio: 1 / 1) {
+      .video-wrapper { padding-top: 46.23%; }
+    }
+
+    @keyframes vslFrameGlow {
+      0%, 100% { box-shadow: 0 0 0 1px rgba(225,29,72,0.15), 0 0 40px rgba(225,29,72,0.25), 0 20px 60px rgba(0,0,0,0.6); }
+      50% { box-shadow: 0 0 0 1px rgba(225,29,72,0.45), 0 0 80px rgba(225,29,72,0.5), 0 20px 60px rgba(0,0,0,0.6); }
     }
 
     .video-wrapper iframe {
@@ -430,40 +444,80 @@
 
     /* ===== QUIZ ===== */
     .mockup-section {
-      background: linear-gradient(180deg, var(--bg) 0%, #0a0505 50%, var(--bg) 100%);
+      background: linear-gradient(180deg, var(--bg) 0%, #050202 50%, var(--bg) 100%);
+      position: relative;
+    }
+
+    .mockup-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url('data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20z" fill="rgba(225,29,72,0.02)" fill-rule="evenodd"/></svg>');
+      pointer-events: none;
     }
 
     .quiz-card {
       width: 100%;
-      max-width: 520px;
+      max-width: 560px;
       margin: 0 auto;
-      background: linear-gradient(160deg, #141010 0%, #0a0707 100%);
-      border: 1px solid rgba(225,29,72,0.25);
-      border-radius: 24px;
-      padding: 32px 30px;
-      box-shadow: 0 30px 70px rgba(0,0,0,0.6), var(--accent-glow-lg);
+      background: rgba(10, 5, 5, 0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(225,29,72,0.3);
+      border-radius: 20px;
+      padding: 40px 30px;
+      box-shadow: 0 0 40px rgba(225,29,72,0.1), inset 0 0 20px rgba(255,255,255,0.02);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quiz-card::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: conic-gradient(transparent, transparent, transparent, var(--accent));
+      animation: rotateBorder 4s linear infinite;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
+    @keyframes rotateBorder {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .quiz-progress {
       width: 100%;
-      height: 5px;
+      height: 6px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.05);
       overflow: hidden;
-      margin-bottom: 26px;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 2;
     }
 
     .quiz-progress-fill {
       height: 100%;
       width: 0%;
       border-radius: 999px;
-      background: linear-gradient(90deg, var(--accent-dark), var(--accent-light));
-      transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      background: linear-gradient(90deg, #f43f5e, #3b82f6, #06b6d4);
+      background-size: 200% 100%;
+      animation: gradientMove 2s linear infinite;
+      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 0 10px rgba(244,63,94,0.8);
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
     }
 
     .quiz-step {
       display: none;
-      animation: quizStepIn 0.4s ease;
+      animation: quizStepIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      z-index: 2;
     }
 
     .quiz-step.active {
@@ -471,111 +525,167 @@
     }
 
     @keyframes quizStepIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
 
     .quiz-question {
-      font-size: 19px;
-      font-weight: 700;
+      font-size: 22px;
+      font-weight: 800;
       color: #fff;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-shadow: 0 0 10px rgba(255,255,255,0.2);
     }
 
     .quiz-options {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
 
     .quiz-option {
       appearance: none;
       width: 100%;
-      padding: 16px 20px;
-      font-size: 15px;
-      font-weight: 600;
+      padding: 18px 24px;
+      font-size: 16px;
+      font-weight: 700;
       font-family: inherit;
       color: var(--text);
-      background: rgba(225,29,72,0.06);
-      border: 1.5px solid rgba(225,29,72,0.2);
-      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
       cursor: pointer;
       text-align: left;
-      transition: all 0.25s ease;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quiz-option::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transition: left 0.4s ease;
+    }
+
+    .quiz-option:hover::after {
+      left: 100%;
     }
 
     .quiz-option:hover {
-      background: rgba(225,29,72,0.14);
-      border-color: rgba(225,29,72,0.4);
+      background: rgba(225,29,72,0.1);
+      border-color: rgba(225,29,72,0.5);
       transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(225,29,72,0.2);
     }
 
-    .quiz-option.selected {
-      background: rgba(225,29,72,0.22);
-      border-color: var(--accent);
+    /* ===== LOADING SCI-FI ===== */
+    .quiz-loading {
+      text-align: center;
+      padding: 30px 0;
     }
 
+    .radar-box {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      border: 2px solid rgba(6,182,212,0.3);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(6,182,212,0.2);
+    }
+
+    .radar-box::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 100%; height: 100%;
+      background: conic-gradient(from 0deg, transparent 70%, rgba(6,182,212,0.8) 100%);
+      transform-origin: 0 0;
+      animation: scan 1.5s linear infinite;
+    }
+
+    @keyframes scan {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      color: #06b6d4;
+      font-family: monospace;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      animation: pulseText 1s infinite;
+    }
+
+    /* ===== FINAL RESULT ===== */
     .quiz-result {
       text-align: center;
     }
 
     .quiz-result-icon {
-      width: 56px;
-      height: 56px;
-      margin: 0 auto 18px;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
       border-radius: 50%;
-      background: rgba(245,158,11,0.15);
+      background: rgba(16,185,129,0.15);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--gold);
+      color: #10b981;
+      border: 2px solid #10b981;
+      box-shadow: 0 0 40px rgba(16,185,129,0.4);
+      animation: scalePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes scalePop {
+      0% { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
     }
 
     .quiz-result-icon svg {
-      width: 28px;
-      height: 28px;
+      width: 40px;
+      height: 40px;
     }
 
     .quiz-result-title {
-      font-size: 20px;
-      font-weight: 800;
+      font-size: 26px;
+      font-weight: 900;
       color: #fff;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      text-shadow: 0 0 15px rgba(255,255,255,0.3);
     }
 
     .quiz-result-text {
       color: var(--text-secondary);
-      font-size: 15px;
-      line-height: 1.6;
-      margin-bottom: 24px;
-    }
-
-    .quiz-result .cta-btn {
-      animation: none;
-      padding: 16px 32px;
       font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 30px;
     }
 
     .quiz-bot-row {
-      display: none;
-      align-items: flex-end;
-      gap: 10px;
-      text-align: left;
-      margin: 22px 0;
-    }
-
-    .quiz-bot-row.show {
       display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      text-align: left;
+      margin: 0 0 24px;
     }
 
     .quiz-bot-avatar {
-      width: 34px;
-      height: 34px;
+      flex: 0 0 auto;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       overflow: hidden;
-      border: 2px solid rgba(225,29,72,0.35);
-      flex: 0 0 auto;
+      border: 1px solid rgba(225,29,72,0.5);
+      box-shadow: 0 0 12px rgba(225,29,72,0.35);
     }
 
     .quiz-bot-avatar img {
@@ -586,43 +696,38 @@
     }
 
     .quiz-bot-bubble {
-      background: linear-gradient(135deg, #16110f 0%, #1a1414 100%);
-      border: 1px solid rgba(225,29,72,0.15);
-      border-radius: 20px;
-      padding: 14px 18px;
-      max-width: 320px;
-      color: #e8e8e8;
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 4px 14px 14px 14px;
+      padding: 12px 16px;
       font-size: 14px;
       line-height: 1.5;
-    }
-
-    .quiz-bot-typing {
-      display: flex;
-      gap: 6px;
-      padding: 4px 2px;
+      color: var(--text-secondary);
     }
 
     .quiz-bot-typing .dot {
-      width: 8px;
-      height: 8px;
+      display: inline-block;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
-      background: #666;
-      animation: quizBlink 1.4s infinite both;
+      background: var(--text-muted);
+      margin-right: 4px;
+      animation: quizBotDotBlink 1.2s infinite;
     }
 
-    .quiz-bot-typing .dot:nth-child(2) { animation-delay: .2s; }
-    .quiz-bot-typing .dot:nth-child(3) { animation-delay: .4s; }
+    .quiz-bot-typing .dot:nth-child(2) { animation-delay: 0.2s; }
+    .quiz-bot-typing .dot:nth-child(3) { animation-delay: 0.4s; }
 
-    @keyframes quizBlink {
-      0% { opacity: .25; transform: translateY(0); }
-      20% { opacity: 1; transform: translateY(-1px); }
-      100% { opacity: .25; transform: translateY(0); }
+    @keyframes quizBotDotBlink {
+      0%, 60%, 100% { opacity: 0.3; }
+      30% { opacity: 1; }
     }
 
     .quiz-unlock {
       opacity: 0;
-      transform: translateY(12px) scale(0.96);
-      transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1);
+      transform: translateY(20px) scale(0.9);
+      transition: all 0.6s cubic-bezier(0.16,1,0.3,1);
     }
 
     .quiz-unlock.show {
@@ -634,19 +739,21 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 16px;
-      border-radius: 999px;
-      background: rgba(245,158,11,0.12);
-      border: 1px solid rgba(245,158,11,0.35);
-      color: var(--gold);
-      font-weight: 700;
-      font-size: 13px;
-      margin-bottom: 18px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.5);
+      color: #10b981;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+      box-shadow: 0 0 20px rgba(16,185,129,0.2);
     }
 
     .quiz-unlock-badge svg {
-      width: 15px;
-      height: 15px;
+      width: 18px;
+      height: 18px;
     }
 
     /* ===== FEATURES ===== */
@@ -1363,12 +1470,81 @@
   <!-- ===== HERO ===== -->
   <section class="hero" id="hero">
     <img src="images/logo.png" alt="LegitAlmaz" class="hero-logo">
-    <h1>O MELHOR <span class="gradient-text">XIT MOBILE</span> PARA O SEU FREE FIRE</h1>
-    <p class="hero-sub">Desenvolvemos o Xit Mobile perfeito para você usar em apostado e na ranqueada. Totalmente ajustável para puxar na cabeça mais forte ou mais fraco se quiser disfarçar.</p>
-    <a href="#preco" class="cta-btn"><img src="images/logo.png" alt="" class="cta-btn-logo">GARANTIR MEU XIT MOBILE</a>
+    <h1><span class="gradient-text">O PAINEL H4CK QUE</span> DOMINOU OS APOSTADOS & RANKEDS BR</h1>
+    
+    <!-- ===== VIDEO NO HERO ===== -->
+    <div class="video-wrapper reveal" id="vsl-container" style="width: 100%; max-width: 900px; margin: 20px auto 40px;">
+      <iframe id="vimeo-vsl" src="https://player.vimeo.com/video/1153794946?badge=0&amp;autopause=0&amp;player_id=vimeo-vsl&amp;app_id=58479&amp;controls=0&amp;muted=1&amp;autoplay=1&amp;title=0&amp;byline=0&amp;portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" title="VEJA COMO CALIBRAR SUA SENSIBILIDADE EM MINUTOS"></iframe>
+      
+      <!-- Overlay de Áudio -->
+      <div id="vsl-overlay" class="vsl-overlay">
+        <div class="vsl-overlay-content">
+          <svg viewBox="0 0 24 24" class="pulse-icon"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          <div class="vsl-overlay-text">SISTEMA INICIADO!</div>
+          <div class="vsl-overlay-sub">Clique para ativar o som e liberar o acesso restrito</div>
+        </div>
+      </div>
+      
+      <!-- Hitbox para Pause/Play pós ativação -->
+      <div id="vsl-hitbox" class="vsl-hitbox"></div>
+    </div>
+    <script src="https://player.vimeo.com/api/player.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const iframe = document.querySelector('#vimeo-vsl');
+        if(iframe && window.Vimeo) {
+          const player = new Vimeo.Player(iframe);
+          const overlay = document.getElementById('vsl-overlay');
+          const hitbox = document.getElementById('vsl-hitbox');
+          let hasStarted = false;
+
+          overlay.addEventListener('click', () => {
+            player.setVolume(1).catch(() => {});
+            
+            player.setCurrentTime(0).then(() => {
+              player.play();
+              overlay.style.opacity = '0';
+              setTimeout(() => {
+                overlay.style.display = 'none';
+                hitbox.style.display = 'block';
+                hasStarted = true;
+              }, 300);
+            }).catch(err => {
+              console.error("Erro ao reiniciar vídeo:", err);
+            });
+          });
+
+          hitbox.addEventListener('click', () => {
+            if(!hasStarted) return;
+            player.getPaused().then(paused => {
+              if (paused) {
+                player.play();
+              } else {
+                player.pause();
+              }
+            });
+          });
+
+          player.on('ended', function() {
+            hasStarted = false;
+            hitbox.style.display = 'none';
+            overlay.querySelector('.vsl-overlay-text').textContent = 'REASSISTIR TRANSMISSÃO';
+            overlay.querySelector('.vsl-overlay-sub').textContent = 'Clique para decodificar a mensagem novamente';
+            overlay.style.display = 'flex';
+            
+            setTimeout(() => {
+              overlay.style.opacity = '1';
+            }, 50);
+          });
+        }
+      });
+    </script>
+    
+    <p class="hero-sub">O primeiro painel injetável 100% EXTERNAL. O painel se adapta ao seu estilo e puxa os capas de forma automática.</p>
+    <a href="#preco" class="cta-btn"><img src="images/logo.png" alt="" class="cta-btn-logo">Eu quero o Xit Pro</a>
     <div class="cta-secure">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-      <span>Compra Segura | Entrega Imediata</span>
+      <span>Conexão Criptografada | Acesso Imediato</span>
     </div>
   </section>
 
@@ -1378,81 +1554,446 @@
     </svg>
   </div>
 
-  <!-- ===== VIDEO ===== -->
-  <section class="section video-section" id="video">
+  <!-- ===== PAINEL PLACEHOLDER ===== -->
+  <section class="section" id="painel-replica" style="background: linear-gradient(180deg, #0a0505 0%, var(--bg) 100%);">
     <div class="container">
-      <h2 class="section-title reveal">Veja o Xit em Ação</h2>
-      <p class="section-subtitle reveal">Assista ao Xit Mobile em ação na minha conta com primeiro passe</p>
-      <div class="video-wrapper reveal" id="vsl-container">
-        <iframe id="vimeo-vsl" src="https://player.vimeo.com/video/1153794946?badge=0&amp;autopause=0&amp;player_id=vimeo-vsl&amp;app_id=58479&amp;controls=0&amp;muted=1&amp;autoplay=1&amp;title=0&amp;byline=0&amp;portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" title="VEJA COMO CALIBRAR SUA SENSIBILIDADE EM MINUTOS"></iframe>
-        
-        <!-- Overlay de Áudio -->
-        <div id="vsl-overlay" class="vsl-overlay">
-          <div class="vsl-overlay-content">
-            <svg viewBox="0 0 24 24" class="pulse-icon"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-            <div class="vsl-overlay-text">SEU VÍDEO JÁ COMEÇOU!</div>
-            <div class="vsl-overlay-sub">Clique aqui para ativar o som e assistir desde o início</div>
+      <h2 class="section-title reveal">O PAINEL POR DENTRO</h2>
+      <p class="section-subtitle reveal">Interface de controle de alta tecnologia</p>
+      <div class="reveal">
+        <style>
+          .panel-replica {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #fff;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05);
+            user-select: none;
+          }
+          .panel-header {
+            background: #d60000;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+          }
+          .panel-header-icon { font-size: 12px; cursor: pointer; color: #fff; opacity: 0.8; }
+          .panel-tabs-container {
+            padding: 8px 8px 0 8px;
+            border-bottom: 1px solid #600000;
+            display: flex;
+            gap: 6px;
+            background: #050505;
+          }
+          .panel-tab {
+            background: #111;
+            color: #888;
+            padding: 6px 10px;
+            border-radius: 6px 6px 0 0;
+            font-size: 13px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+          }
+          .panel-tab.active {
+            background: #d60000;
+            color: #fff;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.2);
+          }
+          .panel-body {
+            padding: 20px;
+            background: #050505;
+            min-height: 250px;
+          }
+          .panel-tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+          }
+          .panel-tab-content.active {
+            display: block;
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .panel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+          }
+          .panel-check-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #eaeaea;
+            cursor: pointer;
+          }
+          .panel-check {
+            width: 22px;
+            height: 22px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #111;
+            font-size: 16px;
+            flex-shrink: 0;
+          }
+          .panel-check.active {
+            color: #d60000;
+          }
+          .panel-divider {
+            height: 1px;
+            background: #3a1010;
+            margin: 16px 0;
+          }
+          .panel-control-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+          }
+          .panel-slider {
+            flex: 1;
+            height: 32px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            background: #0a0a0a;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #fff;
+            letter-spacing: 1px;
+          }
+          .panel-slider-thumb {
+            position: absolute;
+            left: 4px;
+            top: 4px;
+            bottom: 4px;
+            width: 14px;
+            background: #d60000;
+            border-radius: 4px;
+          }
+          .panel-control-label {
+            width: 100px;
+            font-size: 14px;
+            color: #eaeaea;
+          }
+          .panel-select {
+            flex: 1;
+            height: 32px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            background: #0a0a0a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-left: 12px;
+            font-size: 14px;
+            color: #fff;
+            overflow: hidden;
+            cursor: pointer;
+          }
+          .panel-select-arrow {
+            background: #d60000;
+            height: 100%;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+          }
+          .panel-radio-group-title {
+            font-size: 14px;
+            color: #eaeaea;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+          .panel-radio-group-title span.icon {
+            color: #fbbf24;
+            font-weight: bold;
+          }
+          .panel-radio-group-title span.icon-green {
+            color: #10b981;
+            font-weight: bold;
+            font-size: 16px;
+            letter-spacing: -2px;
+          }
+          .panel-radio-options {
+            display: flex;
+            gap: 20px;
+          }
+          .panel-radio {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #eaeaea;
+            cursor: pointer;
+          }
+          .panel-radio-circle {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 1px solid #333;
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .panel-radio.active .panel-radio-circle::after {
+            content: '';
+            width: 14px;
+            height: 14px;
+            background: #d60000;
+            border-radius: 50%;
+          }
+          .panel-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+          }
+          .panel-color-square {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            border: 1px solid #333;
+            flex-shrink: 0;
+          }
+          .panel-color-red { background: #ff0000; }
+          .panel-color-green { background: #00ff00; }
+          .panel-color-white { background: #ffffff; }
+        </style>
+
+        <div class="panel-replica">
+          <div class="panel-header">
+            <div class="panel-header-icon">▼</div>
+            <div>@Legit.Almaz</div>
+            <div class="panel-header-icon">✕</div>
+          </div>
+          
+          <div class="panel-tabs-container">
+            <div class="panel-tab active" data-target="tab-aim">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+              AIM
+            </div>
+            <div class="panel-tab" data-target="tab-esp">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              ESP
+            </div>
+            <div class="panel-tab" data-target="tab-misc">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+              MISC
+            </div>
+            <div class="panel-tab" data-target="tab-info">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+              INFO
+            </div>
+          </div>
+          
+          <div class="panel-body">
+            <!-- TAB AIM -->
+            <div id="tab-aim" class="panel-tab-content active">
+              <div class="panel-grid">
+                <div style="display:flex; flex-direction:column; gap:16px;">
+                  <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                    <div class="panel-check active">✔</div>
+                    <span>Ativar Aimbot</span>
+                  </div>
+                  <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                    <div class="panel-check active">✔</div>
+                    <span>Ignorar Derrubados</span>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:16px;">
+                  <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                    <div class="panel-check active">✔</div>
+                    <span>Puxar em Paredes</span>
+                  </div>
+                  <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                    <div class="panel-check"></div>
+                    <span>Exibir FOV</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="panel-divider"></div>
+              
+              <div class="panel-control-row">
+                <div class="panel-slider">
+                  <div class="panel-slider-thumb" style="width:16px;"></div>
+                  <span>[ 39.3 ]</span>
+                </div>
+                <div class="panel-control-label">Regular Fov</div>
+              </div>
+              
+              <div class="panel-control-row">
+                <div class="panel-select">
+                  <span>Cabeça</span>
+                  <div class="panel-select-arrow">▼</div>
+                </div>
+                <div class="panel-control-label">Puxada</div>
+              </div>
+              
+              <div class="panel-divider"></div>
+              
+              <div class="panel-radio-group-title">Tipo de Aimbot:</div>
+              <div class="panel-radio-options">
+                <div class="panel-radio active" onclick="this.parentElement.querySelectorAll('.panel-radio').forEach(el=>el.classList.remove('active')); this.classList.add('active');">
+                  <div class="panel-radio-circle"></div>
+                  <span>Ao Atirar</span>
+                </div>
+                <div class="panel-radio" onclick="this.parentElement.querySelectorAll('.panel-radio').forEach(el=>el.classList.remove('active')); this.classList.add('active');">
+                  <div class="panel-radio-circle"></div>
+                  <span>Ao Olhar</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB ESP -->
+            <div id="tab-esp" class="panel-tab-content">
+              <div class="panel-grid">
+                <div style="display:flex; flex-direction:column; gap:16px;">
+                  <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                    <div class="panel-check"></div>
+                    <span>Ativar ESP</span>
+                  </div>
+                  <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                    <div class="panel-check active">✔</div>
+                    <span>ESP Linha</span>
+                  </div>
+                  <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                    <div class="panel-check active">✔</div>
+                    <span>ESP Caixa</span>
+                  </div>
+                  <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                    <div class="panel-check active">✔</div>
+                    <span>ESP Esqueleto</span>
+                  </div>
+                  <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                    <div class="panel-check active">✔</div>
+                    <span>ESP Nome</span>
+                  </div>
+                  <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                    <div class="panel-check active">✔</div>
+                    <span>ESP Vida</span>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:16px;">
+                  <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                    <div class="panel-check"></div>
+                    <span>Esconder Painel</span>
+                  </div>
+                  <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                    <div class="panel-check"></div>
+                    <span>ESP Distancia</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB MISC -->
+            <div id="tab-misc" class="panel-tab-content">
+              <div class="panel-radio-group-title">
+                <span class="icon">⚠️</span> Funções Rage
+              </div>
+              <div class="panel-grid-3">
+                <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                  <div class="panel-check"></div>
+                  <span>AimKill</span>
+                </div>
+                <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                  <div class="panel-check"></div>
+                  <span>Voar Player</span>
+                </div>
+                <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                  <div class="panel-check"></div>
+                  <span>Teleport 8m</span>
+                </div>
+                <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                  <div class="panel-check"></div>
+                  <span>Speed</span>
+                </div>
+                <div class="panel-check-row" onclick="this.querySelector('.panel-check').classList.toggle('active'); this.querySelector('.panel-check').textContent = this.querySelector('.panel-check').classList.contains('active') ? '✔' : ''">
+                  <div class="panel-check"></div>
+                  <span>No Recoil</span>
+                </div>
+              </div>
+
+              <div class="panel-divider"></div>
+
+              <div class="panel-radio-group-title">
+                <span class="icon-green">≡</span> Personalização
+              </div>
+              <div class="panel-grid">
+                <div style="display:flex; flex-direction:column; gap:16px;">
+                  <div class="panel-check-row">
+                    <div class="panel-color-square panel-color-red"></div>
+                    <span>Cor do Painel</span>
+                  </div>
+                  <div class="panel-check-row">
+                    <div class="panel-color-square panel-color-green"></div>
+                    <span>Cor da ESP Visivel</span>
+                  </div>
+                  <div class="panel-check-row">
+                    <div class="panel-color-square panel-color-white"></div>
+                    <span>Cor do Nome</span>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:16px;">
+                  <div class="panel-check-row">
+                    <div class="panel-color-square panel-color-red"></div>
+                    <span>Cor do FOV</span>
+                  </div>
+                  <div class="panel-check-row">
+                    <div class="panel-color-square panel-color-red"></div>
+                    <span>Cor da ESP Invisivel</span>
+                  </div>
+                  <div class="panel-check-row">
+                    <div class="panel-color-square panel-color-white"></div>
+                    <span>Cor da Distancia</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB INFO -->
+            <div id="tab-info" class="panel-tab-content">
+              <div style="text-align:center; padding: 40px 0; color: #888;">
+                Sistema atualizado.<br>Status: ONLINE
+              </div>
+            </div>
+
           </div>
         </div>
-        
-        <!-- Hitbox para Pause/Play pós ativação -->
-        <div id="vsl-hitbox" class="vsl-hitbox"></div>
-      </div>
-      <script src="https://player.vimeo.com/api/player.js"></script>
-      <script>
-        document.addEventListener('DOMContentLoaded', () => {
-          const iframe = document.querySelector('#vimeo-vsl');
-          if(iframe && window.Vimeo) {
-            const player = new Vimeo.Player(iframe);
-            const overlay = document.getElementById('vsl-overlay');
-            const hitbox = document.getElementById('vsl-hitbox');
-            let hasStarted = false;
 
-            overlay.addEventListener('click', () => {
-              player.setVolume(1).catch(() => {});
-              
-              player.setCurrentTime(0).then(() => {
-                player.play();
-                overlay.style.opacity = '0';
-                setTimeout(() => {
-                  overlay.style.display = 'none';
-                  hitbox.style.display = 'block';
-                  hasStarted = true;
-                }, 300);
-              }).catch(err => {
-                console.error("Erro ao reiniciar vídeo:", err);
-              });
+        <script>
+          document.querySelectorAll('.panel-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+              document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+              document.querySelectorAll('.panel-tab-content').forEach(c => c.classList.remove('active'));
+              tab.classList.add('active');
+              const target = tab.getAttribute('data-target');
+              document.getElementById(target).classList.add('active');
             });
-
-            hitbox.addEventListener('click', () => {
-              if(!hasStarted) return;
-              player.getPaused().then(paused => {
-                if (paused) {
-                  player.play();
-                } else {
-                  player.pause();
-                }
-              });
-            });
-
-            player.on('ended', function() {
-              hasStarted = false;
-              hitbox.style.display = 'none';
-              overlay.querySelector('.vsl-overlay-text').textContent = 'REASSISTIR VÍDEO';
-              overlay.querySelector('.vsl-overlay-sub').textContent = 'Clique aqui para assistir novamente sem perder detalhes';
-              overlay.style.display = 'flex';
-              
-              // Pequeno delay para garantir que a opacidade suba suave e cubra a tela de recomendados
-              setTimeout(() => {
-                overlay.style.opacity = '1';
-              }, 50);
-            });
-          }
-        });
-      </script>
-      <div class="video-counter reveal" style="margin-top: 20px;">
-        <span class="counter-dot"></span>
-        <span>Xit ajustável, puxe na cabeça e domine o jogo</span>
+          });
+        </script>
       </div>
     </div>
   </section>
@@ -1460,43 +2001,77 @@
   <!-- ===== QUIZ ===== -->
   <section class="section mockup-section" id="mockup">
     <div class="container">
-      <h2 class="section-title reveal">O Xit é Para Você?</h2>
-      <p class="section-subtitle reveal">Responda 3 perguntas rápidas e veja se o Xit Mobile faz sentido pro teu jogo</p>
+      <h2 class="section-title reveal">DIAGNÓSTICO DE COMPATIBILIDADE</h2>
+      <p class="section-subtitle reveal">O sistema precisa analisar seu estilo de jogo para calibrar a injeção perfeita. Responda para liberar seu perfil.</p>
       <div class="quiz-card reveal">
         <div class="quiz-progress"><div class="quiz-progress-fill" id="quizProgressFill"></div></div>
+        
         <div class="quiz-step active" data-step="1">
-          <div class="quiz-question">Qual modo você mais joga?</div>
+          <div class="quiz-question">QUAL O SEU FOCO PRINCIPAL?</div>
           <div class="quiz-options">
-            <button class="quiz-option" data-q="1" data-a="ranqueada">Ranqueada</button>
-            <button class="quiz-option" data-q="1" data-a="apostado">Apostado</button>
-            <button class="quiz-option" data-q="1" data-a="ambos">Os dois</button>
+            <button class="quiz-option" data-q="1" data-a="ranqueada">Ranked BR</button>
+            <button class="quiz-option" data-q="1" data-a="apostado">Campeonatos / Apostados</button>
+            <button class="quiz-option" data-q="1" data-a="ambos">Ambos os Cenários</button>
           </div>
         </div>
+        
         <div class="quiz-step" data-step="2">
-          <div class="quiz-question">Sua puxada de capa atual...</div>
+          <div class="quiz-question">TAXA ATUAL DE HEADSHOT (HS)?</div>
           <div class="quiz-options">
-            <button class="quiz-option" data-q="2" data-a="foge">Não sobe capa fácil, trava muito</button>
-            <button class="quiz-option" data-q="2" data-a="ok">Tá ok, mas podia ser melhor</button>
-            <button class="quiz-option" data-q="2" data-a="perfeita">Já subo capa toda hora</button>
+            <button class="quiz-option" data-q="2" data-a="baixa">Abaixo de 40% (Trava muito no peito)</button>
+            <button class="quiz-option" data-q="2" data-a="media">Entre 40% e 70% (Dá pra melhorar)</button>
+            <button class="quiz-option" data-q="2" data-a="alta">Acima de 70% (Já amasso, mas quero mais)</button>
           </div>
         </div>
+        
+        <!-- FAKE LOADING 1 -->
+        <div class="quiz-step quiz-loading" data-step="loading1">
+          <div class="radar-box"></div>
+          <div class="loading-text" id="loadingText1">Processando dados...</div>
+        </div>
+
         <div class="quiz-step" data-step="3">
-          <div class="quiz-question">Você gostaria de poder ajustar a força da puxada para disfarçar?</div>
+          <div class="quiz-question">TIPO DE ARMA FAVORITA?</div>
           <div class="quiz-options">
-            <button class="quiz-option" data-q="3" data-a="diferente">Sim, muito</button>
-            <button class="quiz-option" data-q="3" data-a="naosei">Não ligo pra isso</button>
-            <button class="quiz-option" data-q="3" data-a="igual">Não, prefiro full</button>
+            <button class="quiz-option" data-q="3" data-a="smg">SMG / Tiro Rápido (MP40, UMP)</button>
+            <button class="quiz-option" data-q="3" data-a="ar">AR / Longa Distância (SCAR, M4A1)</button>
+            <button class="quiz-option" data-q="3" data-a="doze">Espingardas / Um Tiro (M1014, Doze Nova)</button>
           </div>
         </div>
-        <div class="quiz-step quiz-result" data-step="4">
-          <div class="quiz-result-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+        
+        <div class="quiz-step" data-step="4">
+          <div class="quiz-question">COMO PREFERE A PUXADA?</div>
+          <div class="quiz-options">
+            <button class="quiz-option" data-q="4" data-a="natural">Discreta e Natural </button>
+            <button class="quiz-option" data-q="4" data-a="agressiva">Agressiva (Trava na cabeça instantaneamente)</button>
           </div>
-          <div class="quiz-result-title" id="quizResultTitle">Resultado</div>
+        </div>
+
+        <div class="quiz-step" data-step="5">
+          <div class="quiz-question">DISPOSITIVO DE ACESSO?</div>
+          <div class="quiz-options">
+            <button class="quiz-option" data-q="5" data-a="android">Android </button>
+            <button class="quiz-option" data-q="5" data-a="ios">iOS </button>
+            <button class="quiz-option" data-q="5" data-a="emulador">Emulador</button>
+          </div>
+        </div>
+
+        <!-- FAKE LOADING 2 -->
+        <div class="quiz-step quiz-loading" data-step="loading2">
+          <div class="radar-box"></div>
+          <div class="loading-text" id="loadingText2">Conectando aos servidores...</div>
+        </div>
+
+        <!-- RESULTADO FINAL DOPAMINA -->
+        <div class="quiz-step quiz-result" data-step="result">
+          <div class="quiz-result-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="quiz-result-title" id="quizResultTitle">PERFIL SINCRONIZADO</div>
           <p class="quiz-result-text" id="quizResultText"></p>
 
           <div class="quiz-bot-row" id="quizBotRow">
-            <div class="quiz-bot-avatar"><img src="images/logo.png" alt="LegitAlmaz"></div>
+            <div class="quiz-bot-avatar"><img src="images/logo.png" alt="Sistema Neural"></div>
             <div class="quiz-bot-bubble">
               <div class="quiz-bot-typing" id="quizBotTyping"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
               <span class="quiz-bot-text" id="quizBotText" style="display:none;"></span>
@@ -1505,11 +2080,11 @@
 
           <div class="quiz-unlock" id="quizUnlock">
             <div class="quiz-unlock-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M7 11V8a5 5 0 019.6-2"/></svg>
-              DESCONTO LIBERADO
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              ACESSO RESTRITO DESBLOQUEADO
             </div>
             <div>
-              <a href="#preco" class="cta-btn"><img src="images/logo.png" alt="" class="cta-btn-logo">GARANTIR COM DESCONTO</a>
+              <a href="#preco" class="cta-btn"><img src="images/logo.png" alt="" class="cta-btn-logo">EU QUERO O XIT MOBILE AGORA</a>
             </div>
           </div>
         </div>
@@ -1525,7 +2100,7 @@
       <div class="features-grid">
         <div class="feature-card reveal">
           <span class="feature-icon"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg></span>
-          <h3 class="feature-title">Puxada Ajustável</h3>
+          <h3 class="feature-title">Aimbot Ajustável</h3>
           <p class="feature-desc">Configure para puxar na cabeça mais forte, ou mais fraco caso você queira disfarçar no apostado.</p>
         </div>
         <div class="feature-card reveal">
@@ -1567,28 +2142,28 @@
           <div class="testimonial-header">
             <div class="testimonial-avatar"><img src="images/logo.png" alt="LegitAlmaz"></div>
             <div>
-              <div class="testimonial-name">Jogador de Ranqueada</div>
+              <div class="testimonial-name">OliverRlk</div>
             </div>
           </div>
-          <p class="testimonial-text">"O Xit é muito brabo, jogo ranqueada o dia todo e a puxada na cabeça tá absurda. Minha taxa subiu pra 80%."</p>
+          <p class="testimonial-text">"O Xit é muito brabo, jogo ranqueada o dia todo e sem disfarçar kkkk tá absurdo farmando nos AP"</p>
         </div>
         <div class="testimonial-card reveal">
           <div class="testimonial-header">
             <div class="testimonial-avatar"><img src="images/logo.png" alt="LegitAlmaz"></div>
             <div>
-              <div class="testimonial-name">Jogador de Apostado</div>
+              <div class="testimonial-name">Jonas Silva</div>
             </div>
           </div>
-          <p class="testimonial-text">"Uso a configuração de puxar mais fraco pra disfarçar no apostado. Os caras nem desconfiam e eu levo todas as salas."</p>
+          <p class="testimonial-text">"Uso a config de puxar mais fraco pra disfarçar no apostado os caras nem pede tela."</p>
         </div>
         <div class="testimonial-card reveal">
           <div class="testimonial-header">
             <div class="testimonial-avatar"><img src="images/logo.png" alt="LegitAlmaz"></div>
             <div>
-              <div class="testimonial-name">Jogador Android</div>
+              <div class="testimonial-name">SeniorThx</div>
             </div>
           </div>
-          <p class="testimonial-text">"A diferença é nítida. Você vira outro jogador. Muito top poder regular a força da puxada direto no painel."</p>
+          <p class="testimonial-text">"Esse painel é outro nível, não igual aqueles q fala que é hack e manda um auxilio... Esse painel da LegitAlmaz e o melhor sem duvidas "</p>
         </div>
       </div>
     </div>
@@ -1603,17 +2178,17 @@
         <div class="step-card reveal">
           <div class="step-number">1</div>
           <h3 class="step-title">ACESSO IMEDIATO</h3>
-          <p class="step-desc">Faça o pagamento via PIX e receba o acesso ao painel na mesma hora no seu e-mail.</p>
+          <p class="step-desc">Faça o pagamento via PIX e receba o acesso ao painel na mesma hora no seu e-mail e WhatsApp.</p>
         </div>
         <div class="step-card reveal">
           <div class="step-number">2</div>
           <h3 class="step-title">INSTALE O PAINEL</h3>
-          <p class="step-desc">Assista ao tutorial rápido de instalação e libere o painel no seu Android.</p>
+          <p class="step-desc">Assista ao tutorial rápido de instalação e libere o painel no seu Android e IOS.</p>
         </div>
         <div class="step-card reveal">
           <div class="step-number">3</div>
           <h3 class="step-title">ATIVE AS FUNÇÕES</h3>
-          <p class="step-desc">Ligue a puxada desejada e sinta a diferença automática nos headshots.</p>
+          <p class="step-desc">Ative o Aimbot e sinta a diferença automática nos capas e os ESP para ver os inimigos atrás da parede</p>
         </div>
       </div>
     </div>
@@ -1628,8 +2203,8 @@
         <div class="fit-card yes reveal">
           <div class="fit-title">Faz sentido se você...</div>
           <ul class="fit-list">
-            <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Quer puxar capa muito mais fácil e aumentar a sua taxa de HS</li>
-            <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Joga apostado e precisa de uma vantagem absurda para dominar as salas</li>
+            <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Quer dar só vermelho nos apostados e rankeds BR</li>
+            <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Joga apostado e precisa de uma vantagem absurda para dominar as partidas e manter o lucro no bolso</li>
             <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Quer o poder de ajustar a força da puxada para disfarçar nas partidas</li>
             <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Procura algo 100% testado, atualizado e totalmente anti-ban</li>
           </ul>
@@ -1637,8 +2212,8 @@
         <div class="fit-card no reveal">
           <div class="fit-title">Não faz sentido se você...</div>
           <ul class="fit-list">
-            <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Já é um Deus no Free Fire e sobe capa facilmente sem precisar de ajuda</li>
-            <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Joga só de vez em quando e não se importa em perder as partidas e o dinheiro dos apostados</li>
+            <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Já é um deus no Free Fire e sobe capa facilmente sem precisar de ajuda</li>
+            <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Aceita perder e não se importa em perder as partidas e o dinheiro dos apostados</li>
             <li><span class="fit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Acha que não vale investir numa vantagem para garantir as suas vitórias</li>
           </ul>
         </div>
@@ -1660,21 +2235,22 @@
             <div class="pricing-product">Acesso de 30 Dias</div>
 
             <ul class="pricing-features">
-              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Puxada ajustável (Forte/Fraca)</li>
-              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Funciona em qualquer Android</li>
-              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Para Ranqueada e Apostado</li>
-              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> 100% Anti-Ban e Seguro</li>
-              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Atualizações de Segurança</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Aimbot/ESP</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Aimkill/Speed Hack</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Android/IOS</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Para Ranqueada e Apostados</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> 100% Anti-Ban</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Atualizações constantes</li>
               <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Suporte no Discord</li>
-              <li class="bonus"><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> BÔNUS: Dicas para Disfarçar no Apostado</li>
+              <li class="bonus"><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> BÔNUS: Passador de replay para apostados</li>
             </ul>
 
             <div class="pricing-prices">
-              <div class="price-current"><span>R$</span> 29,90</div>
+              <div class="price-current"><span>R$</span> 11,99</div>
             </div>
 
             <!-- TROQUE O LINK #checkout-30dias PELO SEU LINK DE PAGAMENTO -->
-            <a href="#checkout-30dias" class="pricing-cta">ASSINAR POR 30 DIAS</a>
+            <a href="https://ggcheckout.app/checkout/v5/H7y54DQy27rXtq9LvA65" class="pricing-cta">ASSINAR POR 30 DIAS</a>
             <div class="payment-methods">
               <span class="payment-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/></svg> Pix</span>
               <span class="payment-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Cartão</span>
@@ -1690,23 +2266,24 @@
             <div class="pricing-product">Acesso Permanente</div>
 
             <ul class="pricing-features">
-              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Puxada ajustável (Forte/Fraca)</li>
-              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Funciona em qualquer Android</li>
-              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Para Ranqueada e Apostado</li>
-              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> 100% Anti-Ban e Seguro</li>
-              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Atualizações de Segurança Vitalícias</li>
-              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Suporte prioritário no Discord</li>
-              <li class="bonus"><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> BÔNUS: Dicas para Disfarçar no Apostado</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Aimbot/ESP</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Aimkill/Speed Hack</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Android/IOS</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Para Ranqueada e Apostados</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> 100% Anti-Ban</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Atualizações constantes</li>
+              <li><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> Suporte no Discord</li>
+              <li class="bonus"><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> BÔNUS: Passador de replay para apostados</li>
               <li class="bonus"><span class="pricing-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span> BÔNUS: Configurações VIP para Camp</li>
             </ul>
 
             <div class="pricing-prices">
               <div class="price-original">De R$ 79,90</div>
-              <div class="price-current"><span>R$</span> 49,90</div>
+              <div class="price-current"><span>R$</span> 19,99</div>
             </div>
 
             <!-- TROQUE O LINK #checkout-permanente PELO SEU LINK DE PAGAMENTO -->
-            <a href="#checkout-permanente" class="pricing-cta"><img src="images/logo.png" alt="" class="pricing-cta-logo">GARANTIR ACESSO PERMANENTE</a>
+            <a href="https://ggcheckout.app/checkout/v5/6dBdfGaUIDnxnuVKvXJ6" class="pricing-cta"><img src="images/logo.png" alt="" class="pricing-cta-logo">GARANTIR ACESSO PERMANENTE</a>
             <div class="payment-methods">
               <span class="payment-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/></svg> Pix</span>
               <span class="payment-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Cartão</span>
@@ -1721,7 +2298,7 @@
         <svg class="mega-guarantee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
         <div class="mega-guarantee-content">
           <h3>Risco ZERO: 7 Dias de Garantia</h3>
-          <p>A LegitAlmaz garante 100% a segurança e o funcionamento do Xit Mobile. Testamos o painel diariamente antes de liberar pra você usar. Se por qualquer motivo você não sentir diferença absurda na puxada, devolvemos <strong>100% do seu dinheiro</strong>. Sem letras miúdas, sem enrolação.</p>
+          <p>A LegitAlmaz garante 100% a segurança e o funcionamento do Xit Mobile. Testamos o painel diariamente antes de liberar pra você usar. Se por qualquer motivo você não gostar do produto, devolvemos <strong>100% do seu dinheiro</strong>, sem enrolação.</p>
         </div>
       </div>
 
@@ -1739,7 +2316,7 @@
             Funciona em qual celular?
             <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
-          <div class="faq-answer"><div class="faq-answer-inner">O app funciona em qualquer celular Android, independente da marca (Samsung, Motorola, Xiaomi, etc). Não funciona em iPhone no momento.</div></div>
+          <div class="faq-answer"><div class="faq-answer-inner">O app funciona em qualquer celular Android & IOS</div></div>
         </div>
         <div class="faq-item reveal">
           <button class="faq-question">
@@ -1789,7 +2366,7 @@
   <!-- ===== FINAL CTA ===== -->
   <section class="final-cta">
     <h2>Não perca essa oportunidade. Garanta o seu Xit agora com <span class="gradient-text">50% de desconto</span>.</h2>
-    <a href="#preco" class="cta-btn"><img src="images/logo.png" alt="" class="cta-btn-logo">QUERO AMASSAR COM DESCONTO</a>
+    <a href="#preco" class="cta-btn"><img src="images/logo.png" alt="" class="cta-btn-logo">Eu quero o Xit Pro</a>
     <div class="instant-access">
       <span>Acesso imediato após a compra</span>
     </div>
@@ -1857,46 +2434,31 @@
       if (!card) return;
       const steps = card.querySelectorAll('.quiz-step');
       const fill = document.getElementById('quizProgressFill');
-      const totalQuestions = 3;
+      const totalQuestions = 5;
       const answers = {};
 
-      function goTo(stepNum) {
+      function goTo(stepId) {
         steps.forEach(s => s.classList.remove('active'));
-        card.querySelector(`.quiz-step[data-step="${stepNum}"]`).classList.add('active');
-        fill.style.width = Math.min(100, ((stepNum - 1) / totalQuestions) * 100) + '%';
+        const nextStep = card.querySelector(`.quiz-step[data-step="${stepId}"]`);
+        if(nextStep) nextStep.classList.add('active');
+        
+        if(typeof stepId === 'number') {
+          fill.style.width = Math.min(100, ((stepId - 1) / totalQuestions) * 100) + '%';
+        } else if (stepId === 'result') {
+          fill.style.width = '100%';
+        }
       }
 
       function showResult() {
-        fill.style.width = '100%';
-        steps.forEach(s => s.classList.remove('active'));
-        card.querySelector('.quiz-result').classList.add('active');
+        goTo('result');
 
-        let score = 0;
-        if (answers[2] === 'foge') score += 2;
-        else if (answers[2] === 'ok') score += 1;
-        if (answers[3] === 'diferente') score += 2;
-        else if (answers[3] === 'naosei') score += 1;
-
-        const modeLabel = { ranqueada: 'na Ranqueada', apostado: 'no Apostado', ambos: 'na Ranqueada e no Apostado' }[answers[1]] || 'no Free Fire';
         const titleEl = document.getElementById('quizResultTitle');
         const textEl = document.getElementById('quizResultText');
 
-        let botMsg;
-        if (score >= 3) {
-          titleEl.textContent = 'O Xit Mobile é perfeito para você!';
-          textEl.textContent = `Jogando ${modeLabel} com esse cenário, o nosso painel vai transformar totalmente a sua jogabilidade, puxando capa muito mais fácil.`;
-          botMsg = 'Show! Pelo seu perfil, a LegitAlmaz liberou o desconto especial que reservamos pra quem termina o teste.';
-        } else if (score >= 1) {
-          titleEl.textContent = 'Você vai amassar com o Xit Mobile';
-          textEl.textContent = `Pra quem joga ${modeLabel}, vale a pena testar o nosso painel — ainda mais com a garantia de 7 dias caso não sinta diferença.`;
-          botMsg = 'Beleza! Pra você testar sem risco, a LegitAlmaz liberou o desconto especial que reservamos pra quem termina o teste.';
-        } else {
-          titleEl.textContent = 'Sua puxada já parece boa, mas o Xit pode melhorar';
-          textEl.textContent = `Pelo que você respondeu, você já joga bem. Mas com o Xit Mobile, você vai garantir muito mais HS de forma automática. Teste com a garantia de 7 dias sem risco.`;
-          botMsg = 'De qualquer forma, a LegitAlmaz liberou o desconto especial que reservamos pra quem termina o teste, para você testar.';
-        }
+        titleEl.textContent = 'PERFIL 100% COMPATÍVEL';
+        textEl.textContent = 'Nossa IA analisou sua biometria e estilo de jogo. O Xit Mobile foi pré-calibrado especificamente para o seu dispositivo, garantindo máxima taxa de HS sem riscos.';
 
-        runBotSequence(botMsg);
+        runBotSequence('Acesso autorizado. Criptografia ativada. Seu desconto foi liberado no banco de dados para iniciar.');
       }
 
       function runBotSequence(message) {
@@ -1913,19 +2475,27 @@
             botText.textContent = message;
             setTimeout(() => {
               unlock.classList.add('show');
-            }, 500);
-          }, 1400);
-        }, 900);
+            }, 600);
+          }, 1800);
+        }, 800);
       }
 
       card.querySelectorAll('.quiz-option').forEach(btn => {
         btn.addEventListener('click', () => {
           const step = parseInt(btn.dataset.q, 10);
           answers[step] = btn.dataset.a;
-          if (step < totalQuestions) {
-            goTo(step + 1);
+          
+          if (step === 2) {
+            // Fake loading 1
+            goTo('loading1');
+            setTimeout(() => { goTo(3); }, 2000);
+          } else if (step === 5) {
+            // Fake loading 2
+            goTo('loading2');
+            setTimeout(() => { showResult(); }, 2500);
           } else {
-            showResult();
+            // Normal next step
+            goTo(step + 1);
           }
         });
       });

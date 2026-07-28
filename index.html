@@ -409,6 +409,84 @@
 
     .msg-media iframe { min-height: 280px; }
 
+    /* ===== CHAT VIDEO (VSL-style frame + audio overlay) ===== */
+    .chat-video-wrapper {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(220,38,38,0.55);
+      box-shadow: 0 0 0 1px rgba(220,38,38,0.15), 0 0 22px rgba(220,38,38,0.3), var(--shadow-xl);
+      animation: chatVideoGlow 2.5s ease-in-out infinite;
+    }
+
+    @keyframes chatVideoGlow {
+      0%, 100% { box-shadow: 0 0 0 1px rgba(220,38,38,0.15), 0 0 16px rgba(220,38,38,0.22), var(--shadow-xl); }
+      50% { box-shadow: 0 0 0 1px rgba(220,38,38,0.35), 0 0 32px rgba(220,38,38,0.5), var(--shadow-xl); }
+    }
+
+    .chat-video-wrapper video {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      background: #000;
+    }
+
+    .chat-video-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      backdrop-filter: blur(3px);
+      cursor: pointer;
+      transition: opacity 0.3s;
+      text-align: center;
+      padding: 18px;
+    }
+
+    .chat-video-overlay-content {
+      animation: chatVideoPulseText 2.5s infinite;
+    }
+
+    @keyframes chatVideoPulseText {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .chat-video-overlay .pulse-icon {
+      width: 32px;
+      height: 32px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      margin-bottom: 8px;
+      animation: chatVideoSoundPulse 1.5s infinite;
+    }
+
+    @keyframes chatVideoSoundPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.1); }
+    }
+
+    .chat-video-overlay-text {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .chat-video-hitbox {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      cursor: pointer;
+      display: none;
+    }
+
     /* ===== CTA ===== */
     .cta {
       display: flex;
@@ -919,7 +997,56 @@ function embedVideoHTML(url) {
       }
 
       const id = 'vid-' + Math.random().toString(36).slice(2);
-      bubble(`<div class="msg-media"><video id="${id}" src="${url}" controls playsinline></video></div>`);
+      bubble(`
+        <div class="msg-media chat-video-wrapper" id="${id}-wrap">
+          <video id="${id}" src="${url}" muted autoplay playsinline webkit-playsinline preload="auto"></video>
+          <div class="chat-video-overlay" id="${id}-overlay">
+            <div class="chat-video-overlay-content">
+              <svg viewBox="0 0 24 24" class="pulse-icon"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <div class="chat-video-overlay-text">Toque para ativar o som</div>
+            </div>
+          </div>
+          <div class="chat-video-hitbox" id="${id}-hitbox"></div>
+        </div>
+      `);
+      setupChatVideo(id);
+    }
+
+    function setupChatVideo(id) {
+      const video = document.getElementById(id);
+      const overlay = document.getElementById(id + '-overlay');
+      const hitbox = document.getElementById(id + '-hitbox');
+      if (!video) return;
+      let hasStarted = false;
+
+      const playPromise = video.play();
+      if (playPromise !== undefined) playPromise.catch(() => {});
+
+      overlay.addEventListener('click', () => {
+        video.muted = false;
+        video.volume = 1;
+        video.currentTime = 0;
+        video.play().catch(() => {});
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          hitbox.style.display = 'block';
+          hasStarted = true;
+        }, 300);
+      });
+
+      hitbox.addEventListener('click', () => {
+        if (!hasStarted) return;
+        if (video.paused) video.play(); else video.pause();
+      });
+
+      video.addEventListener('ended', () => {
+        hasStarted = false;
+        hitbox.style.display = 'none';
+        overlay.querySelector('.chat-video-overlay-text').textContent = 'Toque para reassistir';
+        overlay.style.display = 'flex';
+        setTimeout(() => { overlay.style.opacity = '1'; }, 50);
+      });
     }
 
     function audioMsg(url, autoplay = true) {
