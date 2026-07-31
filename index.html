@@ -163,31 +163,6 @@
 
     .header-spacer { margin-left: auto; }
 
-    .help-btn {
-      border: 0;
-      background: transparent;
-      padding: 0;
-      cursor: pointer;
-      width: 40px;
-      height: 40px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex: 0 0 auto;
-      opacity: 0.7;
-      transition: opacity 0.2s;
-    }
-
-    .help-btn:hover { opacity: 1; }
-
-    .help-btn img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-      filter: brightness(0.8) contrast(1.1);
-    }
-
     /* ===== CHAT AREA ===== */
     .chat {
       position: fixed;
@@ -746,7 +721,6 @@
       .verified-badge { width: 18px; height: 18px; }
       .status-row { font-size: 11px; gap: 5px; }
       .status-dot { width: 8px; height: 8px; }
-      .help-btn { width: 32px; height: 32px; }
 
       .chat-inner { padding: 12px 12px 28px; }
       .row { margin-bottom: 12px; }
@@ -869,9 +843,6 @@ function embedVideoHTML(url) {
           </div>
         </div>
         <div class="header-spacer"></div>
-        <button class="help-btn" id="helpBtn" aria-label="Ajuda" title="Ajuda">
-          <img src="images/PUzQzRa.png" alt="Ajuda">
-        </button>
       </div>
     </div>
 
@@ -907,14 +878,12 @@ function embedVideoHTML(url) {
       PROFILE_AVATAR: 'images/logo.png',
       REDIRECT_MAIN: 'oferta.html',
       REDIRECT_EMULADOR: 'oferta.html',
-      REDIRECT_HELP: '#',
       AUDIO_ANDROID_INTRO: '',
       AUDIO_ANDROID_MID: ''
     };
 
     document.getElementById('profileName').textContent = CONFIG.PROFILE_NAME;
     document.getElementById('avatar').src = CONFIG.PROFILE_AVATAR;
-    document.getElementById('helpBtn').onclick = () => window.open(CONFIG.REDIRECT_HELP, '_blank');
 
     const chat = document.getElementById('chat');
     const chatScroll = document.getElementById('chat-scroll');
