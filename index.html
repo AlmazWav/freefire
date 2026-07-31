@@ -800,16 +800,23 @@
       .input-foot { margin-top: 4px; font-size: 10px; }
     }
   </style>
-<script async="" defer="" src="js/pixel.js"></script></head>
-<body>
+
+  <!-- Utmify: UTMs -->
+  <script src="https://cdn.utmify.com.br/scripts/utms/latest.js"
+          data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
+
+  <!-- Utmify: pixel. O pixelId precisa existir antes do script carregar,
+       por isso os dois ficam juntos e nesta ordem. -->
   <script>
-    window.pixelId = "6764e8b742437069632e328c";
+    window.pixelId = "6a6c0fbe818fca24c2b912f5";
     var a = document.createElement("script");
     a.setAttribute("async", "");
     a.setAttribute("defer", "");
     a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
     document.head.appendChild(a);
   </script>
+</head>
+<body>
 
 <script>
 function embedVideoHTML(url) {
