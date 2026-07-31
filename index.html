@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="pt-BR"><head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>LegitAlmaz — App de Sensibilidade Free Fire</title>
   <meta name="description" content="LegitAlmaz - Xit Mobile para Free Fire.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,6 +36,8 @@
       --radius-md: 18px;
       --header-h: 72px;
       --input-h: 68px;
+      /* barra de gestos do iPhone / navegação por gestos do Android */
+      --safe-b: env(safe-area-inset-bottom, 0px);
     }
 
     * { box-sizing: border-box; }
@@ -192,8 +194,10 @@
       top: var(--header-h);
       left: 0;
       right: 0;
-      bottom: var(--input-h);
+      bottom: calc(var(--input-h) + var(--safe-b));
       overflow: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
       background-color: var(--bg);
       background-image:
         radial-gradient(ellipse at 20% 50%, rgba(220,38,38,0.03) 0%, transparent 70%),
@@ -577,7 +581,8 @@
     .input-bar {
       position: fixed;
       inset: auto 0 0 0;
-      height: var(--input-h);
+      height: calc(var(--input-h) + var(--safe-b));
+      padding-bottom: var(--safe-b);
       background: linear-gradient(to top, rgba(10,10,10,.98), rgba(15,15,15,.96));
       border-top: 1px solid rgba(220,38,38,0.08);
       box-shadow: 0 -10px 28px rgba(0,0,0,.3);
@@ -665,6 +670,68 @@
 
     .input-foot svg { width: 14px; height: 14px; color: #555; }
 
+    /* ===== AVISO DE MENSAGEM NOVA ===== */
+    .new-msg-pill {
+      position: fixed;
+      left: 50%;
+      bottom: calc(var(--input-h) + var(--safe-b) + 14px);
+      z-index: 90;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(220, 38, 38, 0.5);
+      background: rgba(17, 17, 17, 0.96);
+      backdrop-filter: blur(8px);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0,0,0,.5), 0 0 18px rgba(220,38,38,.22);
+      opacity: 0;
+      visibility: hidden;
+      transform: translate(-50%, 14px);
+      transition: opacity .22s ease, transform .22s ease, visibility .22s;
+    }
+
+    .new-msg-pill.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, 0);
+    }
+
+    .new-msg-pill .new-msg-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: newMsgBlink 1.4s ease-in-out infinite;
+    }
+
+    @keyframes newMsgBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .35; }
+    }
+
+    .new-msg-pill svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: var(--accent-light);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .new-msg-pill { transition: none; }
+      .new-msg-pill .new-msg-dot { animation: none; }
+    }
+
     /* ===== RESPONSIVE ===== */
     @media (max-width: 600px) {
       :root {
@@ -708,6 +775,22 @@
       .choice-btn svg { width: 20px; height: 20px; }
 
       .msg-media iframe { min-height: 200px; }
+
+      /* Mídia não pode tomar a tela inteira: precisa caber junto com o
+         balão e ainda sobrar contexto do chat em volta. */
+      .msg-media img,
+      .msg-media video {
+        max-height: 58vh;
+        max-height: 58dvh;
+        object-fit: contain;
+        background: #000;
+      }
+
+      .new-msg-pill {
+        font-size: 12px;
+        padding: 9px 14px;
+        bottom: calc(var(--input-h) + var(--safe-b) + 10px);
+      }
 
       .input-inner { padding: 8px 12px 4px; }
       .input { height: 40px; padding: 0 14px; }
@@ -796,6 +879,12 @@ function embedVideoHTML(url) {
       <div class="chat-inner" id="chat"></div>
     </div>
 
+    <button class="new-msg-pill" id="newMsgPill" type="button">
+      <span class="new-msg-dot"></span>
+      <span id="newMsgCount">1 nova mensagem</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+    </button>
+
     <div class="input-bar">
       <div class="input-inner">
         <div class="composer">
@@ -833,7 +922,82 @@ function embedVideoHTML(url) {
     const statusEl = document.getElementById('status');
 
     function setStatus(text) { statusEl.textContent = text; }
-    function scrollBottom() { chatScroll.scrollTop = chatScroll.scrollHeight; }
+
+    // ===== Scroll =====
+    // O chat só acompanha o fim se a pessoa já estiver lá. Se ela subiu pra
+    // rever um vídeo — ou está assistindo um com som —, a mensagem nova não
+    // arrasta a tela: aparece o aviso e ela desce quando quiser.
+    const STICK_THRESHOLD = 90; // px de folga pra ainda contar como "no fim"
+    const newMsgPill = document.getElementById('newMsgPill');
+    const newMsgCount = document.getElementById('newMsgCount');
+    let stickToBottom = true;
+    let pendingMessages = 0;
+    let autoScrolling = false;
+
+    function atBottom() {
+      return chatScroll.scrollHeight - chatScroll.scrollTop - chatScroll.clientHeight <= STICK_THRESHOLD;
+    }
+
+    // Vídeo rodando com som é conteúdo sendo consumido: nada pode empurrar.
+    function isWatchingVideo() {
+      return Array.from(chat.querySelectorAll('.chat-video-wrapper video'))
+        .some(v => !v.paused && !v.ended && !v.muted);
+    }
+
+    function updatePill() {
+      if (pendingMessages > 0) {
+        newMsgCount.textContent = pendingMessages === 1
+          ? '1 nova mensagem'
+          : pendingMessages + ' novas mensagens';
+        newMsgPill.classList.add('show');
+      } else {
+        newMsgPill.classList.remove('show');
+      }
+    }
+
+    function clearPending() {
+      pendingMessages = 0;
+      updatePill();
+    }
+
+    function goToBottom(behavior = 'smooth') {
+      autoScrolling = true;
+      chatScroll.scrollTo({ top: chatScroll.scrollHeight, behavior });
+      stickToBottom = true;
+      clearPending();
+      setTimeout(() => { autoScrolling = false; }, 500);
+    }
+
+    function scrollBottom({ isMessage = false } = {}) {
+      if (stickToBottom && !isWatchingVideo()) {
+        autoScrolling = true;
+        chatScroll.scrollTop = chatScroll.scrollHeight;
+        requestAnimationFrame(() => { autoScrolling = false; });
+        return;
+      }
+      if (isMessage) {
+        pendingMessages++;
+        updatePill();
+      }
+    }
+
+    chatScroll.addEventListener('scroll', () => {
+      if (autoScrolling) return; // ignora o scroll que nós mesmos causamos
+      stickToBottom = atBottom();
+      if (stickToBottom) clearPending();
+    }, { passive: true });
+
+    newMsgPill.addEventListener('click', () => goToBottom());
+
+    // Vídeo e imagem só ganham altura depois de carregar; se a pessoa está
+    // no fim, reajusta pra não cortar o balão pela metade.
+    function keepBottomOnMediaLoad(row) {
+      row.querySelectorAll('img, video').forEach(el => {
+        const fix = () => { if (stickToBottom) scrollBottom(); };
+        el.addEventListener('load', fix, { once: true });
+        el.addEventListener('loadedmetadata', fix, { once: true });
+      });
+    }
     function playNew() { try { sfxNew.currentTime = 0; sfxNew.play(); } catch (e) {} }
     function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
     function trackCustom(name) { try { fbq('trackCustom', name); } catch (e) {} }
@@ -854,7 +1018,7 @@ function embedVideoHTML(url) {
       return `<div class="msg-avatar"><img src="${CONFIG.PROFILE_AVATAR}" alt="${CONFIG.PROFILE_NAME}"></div>`;
     }
 
-    function rowTemplate(content, { host = true, withAvatar = true } = {}) {
+    function rowTemplate(content, { host = true, withAvatar = true, isMessage = true } = {}) {
       const row = document.createElement('div');
       row.className = 'row ' + (host ? 'host' : 'guest');
       const inner = document.createElement('div');
@@ -863,7 +1027,8 @@ function embedVideoHTML(url) {
       inner.insertAdjacentHTML('beforeend', content);
       row.appendChild(inner);
       chat.appendChild(row);
-      scrollBottom();
+      scrollBottom({ isMessage });
+      keepBottomOnMediaLoad(row);
       return row;
     }
 
@@ -882,7 +1047,7 @@ function embedVideoHTML(url) {
       wrap.className = 'note-wrap';
       wrap.innerHTML = `<div class="note"><svg class="shield-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>${html}</div>`;
       chat.appendChild(wrap);
-      scrollBottom();
+      scrollBottom({ isMessage: true });
     }
 
     function iconSvg(type) {
@@ -919,7 +1084,7 @@ function embedVideoHTML(url) {
       inner.appendChild(card);
       row.appendChild(inner);
       chat.appendChild(row);
-      scrollBottom();
+      scrollBottom({ isMessage: true });
     }
 
     function cta(label, urlPrimary, urlSecondary) {
@@ -937,7 +1102,8 @@ function embedVideoHTML(url) {
 
     function showTypingBubble() {
       const content = `<div class="bubble host-message" style="padding:20px 22px; min-width:130px; max-width:160px;"><div class="typing-wrap"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>`;
-      return rowTemplate(content, { host: true, withAvatar: true });
+      // O "digitando..." é temporário: não conta como mensagem nova.
+      return rowTemplate(content, { host: true, withAvatar: true, isMessage: false });
     }
 
     function jitter(base, spread = 0.2) {
@@ -1016,6 +1182,7 @@ function embedVideoHTML(url) {
       const video = document.getElementById(id);
       const overlay = document.getElementById(id + '-overlay');
       const hitbox = document.getElementById(id + '-hitbox');
+      const wrap = document.getElementById(id + '-wrap');
       if (!video) return;
       let hasStarted = false;
 
@@ -1027,6 +1194,16 @@ function embedVideoHTML(url) {
         video.volume = 1;
         video.currentTime = 0;
         video.play().catch(() => {});
+
+        // A partir daqui a pessoa está assistindo: enquadra o vídeo na tela
+        // e solta o chat do fim, pra mensagem nova não puxar a visão embora.
+        stickToBottom = false;
+        if (wrap) {
+          autoScrolling = true;
+          wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => { autoScrolling = false; }, 500);
+        }
+
         overlay.style.opacity = '0';
         setTimeout(() => {
           overlay.style.display = 'none';
