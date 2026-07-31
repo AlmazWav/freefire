@@ -239,9 +239,10 @@
     .bubble-text { display: block; }
 
     .bubble.host-message {
-      min-width: 0;
+      /* largura mínima pra hora nunca escapar da bolha em texto curto */
+      min-width: 78px;
       max-width: 100%;
-      padding: 16px 18px 38px;
+      padding: 16px 18px 30px;
       font-size: 15px;
       line-height: 1.45;
       letter-spacing: -.01em;
@@ -251,8 +252,10 @@
     }
 
     .bubble.guest-message {
+      /* aqui cabe hora + checks, então precisa de mais folga que a do host */
+      min-width: 96px;
       max-width: 80%;
-      padding: 14px 16px 34px;
+      padding: 14px 16px 28px;
       background: linear-gradient(135deg, #1c1c1c 0%, #212121 100%);
       color: #f0f0f0;
       font-size: 14px;
@@ -261,21 +264,39 @@
       border: 1px solid rgba(242,177,52,0.15);
     }
 
-    .msg-time {
+    /* Hora e checks vivem juntos num rodapé: alinhados pelo mesmo eixo,
+       nunca empilhados um por cima do outro. */
+    .msg-meta {
       position: absolute;
       right: 14px;
       bottom: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      line-height: 1;
+    }
+
+    .msg-time {
       color: #555;
       font-size: 11px;
       font-weight: 500;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
 
     .checks {
-      position: absolute;
-      right: 12px;
-      bottom: 8px;
-      width: 14px;
-      height: 14px;
+      display: block;
+      width: 16px;
+      flex: 0 0 auto;
+    }
+
+    /* Sem altura fixa: o SVG é 38.6x24.7, forçar um quadrado deixaria
+       os traços encolhidos e fora do eixo da hora. */
+    .checks svg {
+      display: block;
+      width: 100%;
+      height: auto;
     }
 
     /* ===== NOTE ===== */
@@ -726,15 +747,21 @@
       .row { margin-bottom: 12px; }
       .msg-avatar { width: 28px; height: 28px; }
       .bubble.host-message {
-        padding: 14px 14px 32px;
+        min-width: 72px;
+        padding: 14px 14px 27px;
         border-radius: 18px;
         font-size: 14px;
       }
       .bubble.guest-message {
-        padding: 12px 14px 28px;
+        min-width: 88px;
+        padding: 12px 14px 25px;
         border-radius: 16px;
         font-size: 13px;
       }
+
+      .msg-meta { right: 12px; bottom: 8px; gap: 4px; }
+      .msg-time { font-size: 10px; }
+      .checks { width: 15px; }
 
       .choice-card { padding: 16px 14px; border-radius: 16px; }
       .choice-title { font-size: 12px; margin-bottom: 12px; }
@@ -980,7 +1007,7 @@ function embedVideoHTML(url) {
     }
 
     function checksSVG() {
-      return '<svg viewBox="0 0 38.626 24.684" width="20" height="20" aria-hidden="true"><g transform="translate(-708.9 -601.383)"><path d="M728.035,623.468l1.382,1.482,17.929-20.334" transform="translate(-1.937 -1.117)" fill="none" stroke="#53bdeb" stroke-linecap="round" stroke-width="3"></path><path d="M712.017,616.07l7.088,8.039,17.757-20.14" transform="translate(-1 -0.469)" fill="none" stroke="#53bdeb" stroke-linecap="round" stroke-width="3"></path></g></svg>';
+      return '<svg viewBox="0 0 38.626 24.684" aria-hidden="true"><g transform="translate(-708.9 -601.383)"><path d="M728.035,623.468l1.382,1.482,17.929-20.334" transform="translate(-1.937 -1.117)" fill="none" stroke="#53bdeb" stroke-linecap="round" stroke-width="3"></path><path d="M712.017,616.07l7.088,8.039,17.757-20.14" transform="translate(-1 -0.469)" fill="none" stroke="#53bdeb" stroke-linecap="round" stroke-width="3"></path></g></svg>';
     }
 
     function messageAvatar() {
@@ -1004,9 +1031,9 @@ function embedVideoHTML(url) {
     function bubble(html, { host = true } = {}) {
       const time = getTimeLabel();
       const bubbleClass = host ? 'host-message' : 'guest-message';
-      let extra = `<span class="msg-time">${time}</span>`;
-      if (!host) extra += `<span class="checks">${checksSVG()}</span>`;
-      const content = `<div class="bubble ${bubbleClass}"><span class="bubble-text">${html}</span>${extra}</div>`;
+      let meta = `<span class="msg-time">${time}</span>`;
+      if (!host) meta += `<span class="checks">${checksSVG()}</span>`;
+      const content = `<div class="bubble ${bubbleClass}"><span class="bubble-text">${html}</span><span class="msg-meta">${meta}</span></div>`;
       rowTemplate(content, { host, withAvatar: host });
       playNew();
     }
