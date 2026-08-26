@@ -1060,7 +1060,11 @@
        Vimeo) e o player so nasce no toque. */
     .vfeedback-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      /* auto-fit + teto de largura: com 2 ou 3 cards eles ficam do mesmo
+         tamanho e centralizados, em vez de esticar pra preencher a linha
+         (esticar aumentaria a altura junto, por causa do 9:16). */
+      grid-template-columns: repeat(auto-fit, minmax(0, 336px));
+      justify-content: center;
       gap: 22px;
       margin-top: 40px;
     }
@@ -2370,7 +2374,6 @@
       <div class="vfeedback-dots" role="tablist" aria-label="Navegar entre os feedbacks">
         <button class="vfeedback-dot is-active" type="button" role="tab" aria-selected="true" aria-label="Feedback 1"></button>
         <button class="vfeedback-dot" type="button" role="tab" aria-selected="false" aria-label="Feedback 2"></button>
-        <button class="vfeedback-dot" type="button" role="tab" aria-selected="false" aria-label="Feedback 3"></button>
       </div>
     </div>
   </section>
@@ -2543,19 +2546,6 @@
           </button>
         </div>
 
-        <div class="vfeedback-card reveal" data-vimeo="1130190789">
-          <div class="vfeedback-stage"></div>
-          <button class="vfeedback-cover" type="button" aria-label="Assistir feedback em video (19 segundos)">
-            <img src="https://i.vimeocdn.com/video/2073794499-1713f6853b5cf6f171e1add3294d3495b061ffd8a4da9cffa76d968c53852ab4-d_480x854" alt="" width="480" height="854" loading="lazy" decoding="async">
-            <span class="vfeedback-play">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-            </span>
-            <span class="vfeedback-meta">
-              <span class="vfeedback-stars" aria-label="5 estrelas">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-              <span class="vfeedback-dur">0:19</span>
-            </span>
-          </button>
-        </div>
       </div>
     </div>
   </section>
