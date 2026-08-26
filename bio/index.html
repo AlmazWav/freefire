@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="pt-BR">
+<!--
+  ============================================================
+  ALMAZ - LINK NA BIO
+  ============================================================
+  O QUE VOCE PRECISA EDITAR (so estas linhas):
+
+    1) LOGO ................... linha 231
+       Esta apontando para a URL do Imgur (https://i.imgur.com/YpmKmbo.png).
+       Pra trocar a logo: e so mudar a URL do src nessa linha.
+
+    2) NOME ................... linha 235
+
+    3) BIO (frase curta) ...... linha 238
+
+    4) BOTAO 1 - OFERTA
+       link .................... linha 243   (href)
+       texto ................... linha 245
+
+    5) BOTAO 2 - DISCORD
+       link .................... linha 249  (href)
+
+    6) CONTATO / SUPORTE ...... linha 259
+       (esta como mailto: - pode trocar por WhatsApp/Telegram)
+
+    7) PIXELS (Utmify + Meta) . linha 44 a 51
+       Cole os dois scripts dentro do bloco comentado no <head>.
+
+  NAO precisa mexer em mais nada. Sem build, sem dependencia:
+  e so subir este arquivo (e a logo) na raiz do dominio.
+  ============================================================
+-->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050506">
+<title>Almaz</title>
+<meta name="description" content="Almaz - loja digital para gamers.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- ================= RASTREAMENTO - UTMify ================= -->
+<!-- 1. Script de UTMs -->
+<script src="https://cdn.utmify.com.br/scripts/utms/latest.js"
+        data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
+
+<!-- 2. Pixel da UTMify (mesmo pixelId do index/oferta).
+     O pixelId precisa existir ANTES do script carregar. -->
+<script>
+  window.pixelId = "6a8331f816fe7033bc1acbf7";
+  var a = document.createElement("script");
+  a.setAttribute("async", "");
+  a.setAttribute("defer", "");
+  a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+  document.head.appendChild(a);
+</script>
+<!-- ========================================================== -->
+
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0;overflow-x:hidden}
+
+  :root{
+    --bg:#050506;
+    --ink:#f3f3f5;
+    --muted:#8b8c93;
+    --red:#e0222f;
+    --red-hot:#ff5a4a;
+    --blurple:#5865f2;
+    --hair:rgba(255,255,255,.10);
+    --display:'Chakra Petch','Segoe UI',system-ui,sans-serif;
+    --text:'Barlow','Segoe UI',system-ui,sans-serif;
+  }
+
+  body{
+    min-height:100svh;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--text);
+    font-size:16px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:48px 20px calc(28px + env(safe-area-inset-bottom));
+  }
+
+  /* --- luz vermelha difusa + textura metalica (fundo) --- */
+  .bg{position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--bg)}
+  .bg::before{
+    content:"";position:absolute;inset:0;
+    background:
+      radial-gradient(72% 42% at 50% -6%, rgba(224,34,47,.34), transparent 68%),
+      radial-gradient(46% 26% at 50% 64%, rgba(190,20,35,.20), transparent 72%),
+      radial-gradient(90% 60% at 50% 120%, rgba(255,90,74,.07), transparent 70%);
+    animation:breathe 9s ease-in-out infinite alternate;
+  }
+  .bg::after{
+    content:"";position:absolute;inset:0;
+    background:
+      repeating-linear-gradient(100deg, rgba(255,255,255,.022) 0 1px, transparent 1px 5px),
+      radial-gradient(120% 90% at 50% 50%, transparent 42%, rgba(0,0,0,.82) 100%);
+  }
+  @keyframes breathe{from{opacity:.78}to{opacity:1}}
+
+  .wrap{width:100%;max-width:420px;text-align:center}
+
+  /* --- logo --- */
+  .logo-slot{position:relative;display:inline-block;margin:0}
+  .logo{
+    display:block;width:112px;height:112px;object-fit:contain;
+    filter:drop-shadow(0 10px 26px rgba(224,34,47,.45));
+  }
+  .logo-slot::after{
+    content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);
+    width:148px;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(255,90,74,.75),transparent);
+  }
+
+  /* --- nome em cromado --- */
+  h1{
+    margin:30px 0 8px;
+    font-family:var(--display);
+    font-weight:700;
+    font-size:clamp(2.6rem,14vw,3.4rem);
+    line-height:.98;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:#ffffff;
+    background:linear-gradient(180deg,#ffffff 0%,#d5d8dd 34%,#6e7177 51%,#eceef2 63%,#ff2f26 100%);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 8px 20px rgba(224,34,47,.28));
+  }
+
+  .bio{
+    margin:0 auto 34px;max-width:30ch;
+    color:var(--muted);
+    font-size:1rem;
+    text-wrap:balance;
+  }
+
+  /* --- botoes --- */
+  .links{display:flex;flex-direction:column;gap:14px}
+  .btn{
+    position:relative;isolation:isolate;
+    display:flex;align-items:center;justify-content:center;gap:12px;
+    width:100%;min-height:64px;padding:14px 22px;
+    font-family:var(--display);font-weight:600;font-size:1.02rem;
+    letter-spacing:.07em;text-transform:uppercase;text-decoration:none;
+    color:#ffffff;
+    transition:transform .18s ease,color .18s ease;
+  }
+  .btn > span{position:relative;z-index:1}
+  .btn::before{
+    content:"";position:absolute;inset:0;z-index:-2;
+    clip-path:polygon(15px 0,100% 0,100% calc(100% - 15px),calc(100% - 15px) 100%,0 100%,0 15px);
+    transition:background .2s ease,box-shadow .2s ease,filter .2s ease;
+  }
+  .btn:hover{transform:translateY(-2px)}
+  .btn:active{transform:translateY(0)}
+  .btn:focus-visible{outline:2px solid var(--red-hot);outline-offset:4px}
+
+  /* principal: vermelho metalico com reflexo */
+  .btn-offer::before{
+    background:linear-gradient(157deg,#ff6a58 0%,#e0222f 24%,#8d101c 54%,#c3182a 76%,#ff5a4a 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5), inset 0 -18px 26px rgba(0,0,0,.34);
+    filter:drop-shadow(0 12px 28px rgba(224,34,47,.42));
+  }
+  .btn-offer:hover::before{filter:drop-shadow(0 16px 34px rgba(255,90,74,.55))}
+  .btn-offer::after{
+    content:"";position:absolute;inset:0;z-index:-1;
+    clip-path:polygon(15px 0,100% 0,100% calc(100% - 15px),calc(100% - 15px) 100%,0 100%,0 15px);
+    background:linear-gradient(105deg,transparent 34%,rgba(255,255,255,.30) 47%,transparent 59%);
+    transform:translateX(-135%);
+    transition:transform .6s cubic-bezier(.3,.7,.3,1);
+  }
+  .btn-offer:hover::after,.btn-offer:focus-visible::after{transform:translateX(135%)}
+  .btn-offer > span{text-shadow:0 1px 2px rgba(0,0,0,.45)}
+
+  /* secundario: contorno, azul so no icone */
+  .btn-discord{color:#d9dade;font-weight:500}
+  .btn-discord::before{
+    background:rgba(255,255,255,.035);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);
+  }
+  .btn-discord:hover::before{
+    background:rgba(88,101,242,.10);
+    box-shadow:inset 0 0 0 1px rgba(88,101,242,.55);
+  }
+  .btn-discord:hover{color:#ffffff}
+  .btn-discord svg{
+    position:relative;z-index:1;width:22px;height:22px;flex:none;
+    fill:var(--blurple);
+    filter:drop-shadow(0 0 8px rgba(88,101,242,.45));
+  }
+
+  /* estado "em manutencao": mesmo desenho, sem interacao */
+  .btn-soon{cursor:default;color:#7c7d84}
+  .btn-soon::before{
+    background:rgba(255,255,255,.02);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.09);
+  }
+  .btn-soon:hover{transform:none;color:#7c7d84}
+  .btn-soon:hover::before{
+    background:rgba(255,255,255,.02);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.09);
+  }
+  .btn-soon svg{fill:#5a5b62;filter:none;opacity:.65}
+
+  /* --- rodape --- */
+  footer{
+    margin-top:40px;padding-top:18px;
+    border-top:1px solid var(--hair);
+    display:flex;justify-content:center;align-items:center;gap:10px;
+    font-size:.8rem;letter-spacing:.05em;color:#5f6067;
+  }
+  footer a{color:#8b8c93;text-decoration:none;border-bottom:1px solid transparent}
+  footer a:hover{color:var(--red-hot);border-bottom-color:rgba(255,90,74,.5)}
+  footer a:focus-visible{outline:2px solid var(--red-hot);outline-offset:3px}
+  .dot{width:3px;height:3px;background:#3a3b40;border-radius:50%}
+
+  /* --- entrada em sequencia --- */
+  .reveal{opacity:0;transform:translateY(16px);animation:rise .7s cubic-bezier(.22,.75,.3,1) forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+  .d1{animation-delay:.06s}.d2{animation-delay:.18s}.d3{animation-delay:.28s}
+  .d4{animation-delay:.40s}.d5{animation-delay:.52s}.d6{animation-delay:.68s}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+    .reveal{opacity:1;transform:none}
+  }
+
+  @media (min-width:520px){
+    .logo{width:128px;height:128px}
+    .btn{min-height:68px;font-size:1.06rem}
+  }
+</style>
+</head>
+
+<body>
+<div class="bg" aria-hidden="true"></div>
+
+<main class="wrap">
+  <header>
+    <span class="logo-slot reveal d1">
+      <!-- EDITAR-LOGO: troque o src pela URL da sua logo -->
+      <img class="logo" src="https://i.imgur.com/YpmKmbo.png" alt="Logo da Almaz" width="500" height="500" fetchpriority="high">
+    </span>
+
+    <!-- EDITAR-NOME -->
+    <h1 class="reveal d2">LegitAlmaz</h1>
+
+    <!-- EDITAR-BIO -->
+    <p class="bio reveal d3"></p>
+  </header>
+
+  <nav class="links" aria-label="Links principais">
+    <!-- EDITAR-OFERTA-LINK -->
+    <a class="btn btn-offer reveal d4" data-track-link href="https://freefire.almazstore.com.br/">
+      <!-- EDITAR-OFERTA-TEXTO -->
+      <span>App de Sensibilidade</span>
+    </a>
+
+    <!-- DISCORD EM MANUTENCAO: quando o servidor voltar, troque este <span>
+         por: <a class="btn btn-discord reveal d5" data-track-link
+                 href="LINK_DO_DISCORD" target="_blank" rel="noopener">
+         e volte o texto para "Entrar no Discord". -->
+    <span class="btn btn-discord btn-soon reveal d5" role="note" aria-disabled="true">
+      <svg viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
+      <span>Discord em manutenção</span>
+    </span>
+  </nav>
+
+  <footer class="reveal d6">
+    <span>&copy; Legit Almaz</span>
+    <span class="dot" aria-hidden="true"></span>
+    <!-- EDITAR-SUPORTE -->
+    <a href="mailto:suporte@almaz.com.br">Suporte</a>
+  </footer>
+</main>
+
+<script>
+/* Repassa os parametros de rastreio (utm_*, fbclid, gclid, ttclid...) da URL
+   desta pagina para o destino de cada botao, sem sobrescrever o que o link
+   de destino ja tiver. Nao precisa configurar nada aqui. */
+(function () {
+  var incoming = new URLSearchParams(window.location.search);
+  var keys = [];
+  incoming.forEach(function (v, k) { if (keys.indexOf(k) === -1) keys.push(k); });
+  if (!keys.length) return;
+
+  var links = document.querySelectorAll('a[data-track-link]');
+  for (var i = 0; i < links.length; i++) {
+    var a = links[i];
+    var raw = a.getAttribute('href') || '';
+    if (!/^https?:\/\//i.test(raw)) continue; // ignora placeholder ainda nao trocado
+    try {
+      var url = new URL(raw);
+      for (var j = 0; j < keys.length; j++) {
+        var k = keys[j];
+        if (url.searchParams.has(k)) continue; // o destino manda mais que a origem
+        var vals = incoming.getAll(k);
+        for (var n = 0; n < vals.length; n++) url.searchParams.append(k, vals[n]);
+      }
+      a.setAttribute('href', url.toString());
+    } catch (e) { /* href invalido: mantem como esta */ }
+  }
+})();
+</script>
+</body>
+</html>
