@@ -441,6 +441,13 @@
       width: min(240px, 58vw);
     }
 
+    /* Video bem deitado (2:1 pra cima) vira uma tarja fina na largura
+       padrao: com 76vw sobram ~127px de altura no celular. Ganha mais
+       largura pra ter presenca, sem estourar o balao. */
+    .chat-video-ratio.is-wide {
+      width: min(420px, 84vw);
+    }
+
     /* Especificidade maior de proposito: .msg-media iframe tem min-height
        (280px na base, 200px no mobile) e empata em especificidade com
        .chat-video-ratio iframe, ganhando por vir depois no arquivo. */
@@ -1424,6 +1431,10 @@ function embedVideoHTML(url) {
     function embedVimeo(videoId, ratioPct) {
       const id = 'vim-' + Math.random().toString(36).slice(2);
 
+      // Em pe encolhe pra nao virar coluna; bem deitado alarga pra nao
+      // virar tarja. O resto fica na largura padrao.
+      const forma = ratioPct > 100 ? ' is-vertical' : (ratioPct < 60 ? ' is-wide' : '');
+
       // controls=0 mata a barra de progresso, o botao de pular e a tela cheia.
       // title/byline/portrait=0 tiram a tarja do autor em cima do video.
       // pip=0 e keyboard=0 tiram picture-in-picture e atalhos de teclado.
@@ -1435,7 +1446,7 @@ function embedVideoHTML(url) {
 
       bubble(`
         <div class="msg-media chat-video-wrapper" id="${id}-wrap">
-          <div class="chat-video-ratio${ratioPct > 100 ? ' is-vertical' : ''}" style="padding-top:${ratioPct}%">
+          <div class="chat-video-ratio${forma}" style="padding-top:${ratioPct}%">
             <iframe id="${id}"
               src="https://player.vimeo.com/video/${videoId}?${params}"
               frameborder="0"

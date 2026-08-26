@@ -1046,69 +1046,9 @@
       background: linear-gradient(180deg, var(--bg) 0%, #080303 50%, var(--bg) 100%);
     }
 
-    .testimonials-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px;
-    }
-
-    .testimonial-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--border-subtle);
-      border-radius: 20px;
-      padding: 32px 28px;
-      transition: all 0.3s ease;
-    }
-
-    .testimonial-card:hover {
-      border-color: var(--border);
-      transform: translateY(-2px);
-    }
-
-    .testimonial-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 16px;
-    }
-
-    .testimonial-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: #150808;
-      border: 1px solid rgba(225,29,72,0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-
-    .testimonial-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .testimonial-name {
-      font-weight: 700;
-      font-size: 16px;
-    }
-
-    .testimonial-stars {
-      color: var(--gold);
-      font-size: 14px;
-      letter-spacing: 2px;
-    }
-
-    .testimonial-text {
-      color: var(--text-secondary);
-      font-size: 15px;
-      line-height: 1.7;
-      font-style: italic;
-    }
+    /* Bolinhas do carrossel: no desktop os 3 aparecem juntos e elas nao
+       fazem sentido, entao so existem no celular. */
+    .vfeedback-dots { display: none; }
 
     /* ===== FEEDBACK EM VIDEO =====
        Os 3 depoimentos sao verticais (9:16). No desktop ficam lado a lado;
@@ -1818,9 +1758,7 @@
       .section { padding: 40px 0; }
       .section-subtitle { font-size: 16px; padding: 0 10px; }
       .features-grid { grid-template-columns: 1fr; gap: 16px; }
-      .testimonials-grid { grid-template-columns: 1fr; gap: 16px; }
       .feature-card { padding: 24px 20px; }
-      .testimonial-card { padding: 24px 20px; }
 
       /* Carrossel no celular: 3 videos em pe empilhados viram uma pagina
          sem fim. O card cortado na borda direita e de proposito, e a dica
@@ -1845,6 +1783,33 @@
 
       .vfeedback-card { scroll-snap-align: center; }
       .vfeedback-card:hover { transform: none; }
+
+      /* No celular so um card aparece por vez: as bolinhas dizem quantos
+         feedbacks existem e em qual a pessoa esta. */
+      .vfeedback-dots {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      .vfeedback-dot {
+        width: 7px;
+        height: 7px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.22);
+        cursor: pointer;
+        transition: background 0.25s ease, width 0.25s ease;
+      }
+
+      .vfeedback-dot.is-active {
+        width: 20px;
+        border-radius: 999px;
+        background: #e11d48;
+      }
 
       .vfeedback-play { width: 54px; height: 54px; }
       .vfeedback-play svg { width: 21px; height: 21px; }
@@ -2401,6 +2366,12 @@
           });
         </script>
       </div>
+
+      <div class="vfeedback-dots" role="tablist" aria-label="Navegar entre os feedbacks">
+        <button class="vfeedback-dot is-active" type="button" role="tab" aria-selected="true" aria-label="Feedback 1"></button>
+        <button class="vfeedback-dot" type="button" role="tab" aria-selected="false" aria-label="Feedback 2"></button>
+        <button class="vfeedback-dot" type="button" role="tab" aria-selected="false" aria-label="Feedback 3"></button>
+      </div>
     </div>
   </section>
 
@@ -2542,7 +2513,7 @@
   <section class="section testimonials-section" id="depoimentos">
     <div class="container">
       <h2 class="section-title reveal">O Que Muda no Seu Jogo</h2>
-      <p class="section-subtitle reveal">Relatos de quem já está amassando com o Xit Mobile LegitAlmaz</p>
+      <p class="section-subtitle reveal">Toca pra ouvir quem já tá usando o Xit Mobile LegitAlmaz</p>
       <div class="vfeedback-grid">
         <div class="vfeedback-card reveal" data-vimeo="1130190842">
           <div class="vfeedback-stage"></div>
@@ -3030,6 +3001,59 @@
         }).catch(function () {});
       });
     });
+  })();
+  </script>
+
+  <script>
+  /* Bolinhas do carrossel de feedback (so aparecem no celular).
+     Elas seguem o scroll e tambem levam ate o card quando tocadas. */
+  (function () {
+    var grade = document.querySelector('.vfeedback-grid');
+    var dots  = document.querySelector('.vfeedback-dots');
+    if (!grade || !dots) return;
+
+    var cards = grade.querySelectorAll('.vfeedback-card');
+    var bolas = dots.querySelectorAll('.vfeedback-dot');
+    if (!cards.length || bolas.length !== cards.length) return;
+
+    function marcar(i) {
+      for (var k = 0; k < bolas.length; k++) {
+        bolas[k].classList.toggle('is-active', k === i);
+        bolas[k].setAttribute('aria-selected', k === i ? 'true' : 'false');
+      }
+    }
+
+    // Qual card esta mais perto do centro da area visivel da grade.
+    function atual() {
+      var meio = grade.scrollLeft + grade.clientWidth / 2;
+      var melhor = 0, menorDist = Infinity;
+      for (var i = 0; i < cards.length; i++) {
+        var c = cards[i];
+        var centro = c.offsetLeft + c.offsetWidth / 2;
+        var d = Math.abs(centro - meio);
+        if (d < menorDist) { menorDist = d; melhor = i; }
+      }
+      return melhor;
+    }
+
+    var agendado = false;
+    grade.addEventListener('scroll', function () {
+      if (agendado) return;
+      agendado = true;
+      requestAnimationFrame(function () { agendado = false; marcar(atual()); });
+    }, { passive: true });
+
+    for (var i = 0; i < bolas.length; i++) {
+      (function (idx) {
+        bolas[idx].addEventListener('click', function () {
+          var c = cards[idx];
+          grade.scrollTo({ left: c.offsetLeft - (grade.clientWidth - c.offsetWidth) / 2, behavior: 'smooth' });
+          marcar(idx);
+        });
+      })(i);
+    }
+
+    marcar(0);
   })();
   </script>
 
