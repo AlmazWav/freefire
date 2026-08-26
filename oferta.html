@@ -576,63 +576,84 @@
     .vsl-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.65);
+      background: rgba(0,0,0,0.55);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 10;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(3px);
       cursor: pointer;
       transition: opacity 0.3s;
     }
 
     .vsl-overlay-content {
       text-align: center;
-      padding: 30px;
-      animation: pulseText 2.5s infinite;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
     }
 
-    @keyframes pulseText {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
+    /* Um botao redondo e um rotulo. Antes eram tres elementos empilhados
+       com duas animacoes em ritmos diferentes brigando entre si. */
+    .vsl-play {
+      position: relative;
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e11d48 0%, #9f1239 100%);
+      box-shadow: 0 12px 34px rgba(225,29,72,0.42);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.25s ease;
     }
 
-    .vsl-overlay svg.pulse-icon {
-      width: 48px;
-      height: 48px;
-      fill: none;
-      stroke: #fff;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      margin-bottom: 16px;
-      animation: soundPulse 1.5s infinite;
+    /* Halo: o unico movimento aqui. Respira em volta do botao em vez de
+       fazer o bloco inteiro crescer e encolher. */
+    .vsl-play::after {
+      content: "";
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 2px solid rgba(225,29,72,0.55);
+      animation: vslHalo 2.4s ease-out infinite;
     }
 
-    @keyframes soundPulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.6; transform: scale(1.1); }
+    @keyframes vslHalo {
+      0%   { transform: scale(1);    opacity: 0.85; }
+      70%  { transform: scale(1.28); opacity: 0; }
+      100% { transform: scale(1.28); opacity: 0; }
     }
+
+    .vsl-overlay:hover .vsl-play { transform: scale(1.06); }
+
+    .vsl-play svg {
+      width: 30px;
+      height: 30px;
+      fill: #fff;
+    }
+
+    .vsl-play .ico-replay { display: none; }
+    .vsl-overlay.is-ended .ico-som { display: none; }
+    .vsl-overlay.is-ended .ico-replay { display: block; }
 
     .vsl-overlay-text {
       color: #fff;
-      font-size: 24px;
-      font-weight: 900;
-      letter-spacing: -0.02em;
-      margin-bottom: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
     }
 
     @media (max-width: 768px) {
-      .vsl-overlay-content { padding: 20px 24px; }
-      .vsl-overlay-text { font-size: 18px; }
-      .vsl-overlay svg.pulse-icon { width: 36px; height: 36px; }
+      .vsl-overlay-content { padding: 18px; gap: 13px; }
+      .vsl-play { width: 64px; height: 64px; }
+      .vsl-play svg { width: 26px; height: 26px; }
+      .vsl-overlay-text { font-size: 14px; }
     }
 
-    .vsl-overlay-sub {
-      color: var(--accent-light);
-      font-size: 16px;
-      font-weight: 600;
-    }
 
     .vsl-hitbox {
       position: absolute;
@@ -1584,9 +1605,11 @@
       <!-- Overlay de Áudio -->
       <div id="vsl-overlay" class="vsl-overlay">
         <div class="vsl-overlay-content">
-          <svg viewBox="0 0 24 24" class="pulse-icon"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-          <div class="vsl-overlay-text">SISTEMA INICIADO!</div>
-          <div class="vsl-overlay-sub">Clique para ativar o som e liberar o acesso restrito</div>
+          <span class="vsl-play">
+            <svg class="ico-som" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4.03v8.06A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a6.99 6.99 0 0 1 0 13.42v2.06a9 9 0 0 0 0-17.54z"/></svg>
+            <svg class="ico-replay" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z"/></svg>
+          </span>
+          <div class="vsl-overlay-text">Toque para ativar o som</div>
         </div>
       </div>
       
@@ -1604,6 +1627,7 @@
           let hasStarted = false;
 
           overlay.addEventListener('click', () => {
+            overlay.classList.remove('is-ended');
             player.setVolume(1).catch(() => {});
             
             player.setCurrentTime(0).then(() => {
@@ -1633,8 +1657,8 @@
           player.on('ended', function() {
             hasStarted = false;
             hitbox.style.display = 'none';
-            overlay.querySelector('.vsl-overlay-text').textContent = 'REASSISTIR TRANSMISSÃO';
-            overlay.querySelector('.vsl-overlay-sub').textContent = 'Clique para decodificar a mensagem novamente';
+            overlay.classList.add('is-ended');
+            overlay.querySelector('.vsl-overlay-text').textContent = 'Assistir de novo';
             overlay.style.display = 'flex';
             
             setTimeout(() => {
