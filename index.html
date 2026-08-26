@@ -428,8 +428,17 @@
        o <video>, entao a altura vem do padding-top (proporcao real do video). */
     .chat-video-ratio {
       position: relative;
-      width: 100%;
+      /* Largura explicita e obrigatoria: iframe nao tem tamanho intrinseco,
+         e a bolha do chat encolhe ate o min-width se o conteudo nao mandar. */
+      width: min(340px, 76vw);
       background: #000;
+    }
+
+    /* Video em pe ocupa altura demais na largura cheia: 340px de largura
+       dariam ~600px de altura. Fica na mesma largura que o <video> vertical
+       tinha antes. */
+    .chat-video-ratio.is-vertical {
+      width: min(240px, 58vw);
     }
 
     .chat-video-ratio iframe {
@@ -1423,7 +1432,7 @@ function embedVideoHTML(url) {
 
       bubble(`
         <div class="msg-media chat-video-wrapper" id="${id}-wrap">
-          <div class="chat-video-ratio" style="padding-top:${ratioPct}%">
+          <div class="chat-video-ratio${ratioPct > 100 ? ' is-vertical' : ''}" style="padding-top:${ratioPct}%">
             <iframe id="${id}"
               src="https://player.vimeo.com/video/${videoId}?${params}"
               frameborder="0"
