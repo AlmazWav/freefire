@@ -424,6 +424,42 @@
       50% { box-shadow: 0 0 0 1px rgba(220,38,38,0.35), 0 0 32px rgba(220,38,38,0.5), var(--shadow-xl); }
     }
 
+    /* Caixa de proporcao do Vimeo: o iframe nao tem tamanho intrinseco como
+       o <video>, entao a altura vem do padding-top (proporcao real do video). */
+    .chat-video-ratio {
+      position: relative;
+      width: 100%;
+      background: #000;
+    }
+
+    .chat-video-ratio iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 0;   /* anula o min-height:280px do .msg-media iframe */
+    }
+
+    /* Enquanto o player nao respondeu, o overlay nao pode dizer "toque pra
+       ativar o som" - a pessoa toca, nada acontece, e acha que travou. */
+    .chat-video-overlay.is-loading { cursor: default; }
+    .chat-video-overlay.is-loading .pulse-icon { display: none; }
+
+    .chat-video-spinner {
+      width: 26px;
+      height: 26px;
+      margin: 0 auto 8px;
+      border: 2px solid rgba(255,255,255,0.25);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: chatVideoSpin 0.8s linear infinite;
+    }
+
+    @keyframes chatVideoSpin { to { transform: rotate(360deg); } }
+
+    .chat-video-overlay:not(.is-loading) .chat-video-spinner { display: none; }
+
     .chat-video-wrapper video {
       display: block;
       width: 100%;
@@ -801,7 +837,11 @@
     }
   </style>
 
-    <!-- ================= RASTREAMENTO - Microsoft Clarity =================
+    <!-- Player API do Vimeo: precisa existir pro overlay de som funcionar,
+       porque com iframe nao da pra mexer no .muted do elemento direto. -->
+  <script src="https://player.vimeo.com/api/player.js" defer></script>
+
+  <!-- ================= RASTREAMENTO - Microsoft Clarity =================
        Mapa de calor + gravacao de sessao. Projeto: y8g8xqtvbw
        Serve pra ver ONDE a pessoa trava/abandona (inclusive no chat). -->
   <script type="text/javascript">
@@ -1114,8 +1154,13 @@ function embedVideoHTML(url) {
 
     // Vídeo rodando com som é conteúdo sendo consumido: nada pode empurrar.
     function isWatchingVideo() {
-      return Array.from(chat.querySelectorAll('.chat-video-wrapper video'))
+      const nativo = Array.from(chat.querySelectorAll('.chat-video-wrapper video'))
         .some(v => !v.paused && !v.ended && !v.muted);
+      if (nativo) return true;
+      for (const st of chatVimeoState.values()) {
+        if (st.playing && !st.muted) return true;
+      }
+      return false;
     }
 
     function updatePill() {
@@ -1319,7 +1364,7 @@ function embedVideoHTML(url) {
       bubble(`<div class="msg-media"><img src="${url}" alt="imagem"></div>`);
     }
 
-    function embedVideo(url) {
+    function embedVideo(url, opts) {
       if (url.includes('wistia.net/embed/iframe') || url.includes('wistia.com')) {
         bubble(`
           <div class="msg-media">
@@ -1335,6 +1380,9 @@ function embedVideoHTML(url) {
         `);
         return;
       }
+
+      const vimeoId = (String(url).match(/vimeo\.com\/(?:video\/)?(\d+)/) || [])[1];
+      if (vimeoId) { embedVimeo(vimeoId, (opts && opts.ratio) || 56.25); return; }
 
       if (url.includes('scripts.converteai.net')) {
         bubble(`<div class="msg-media"><iframe src="${url}" allow="autoplay; fullscreen" allowfullscreen></iframe></div>`);
@@ -1355,6 +1403,165 @@ function embedVideoHTML(url) {
         </div>
       `);
       setupChatVideo(id);
+    }
+
+    // Estado dos players do Vimeo. Precisa existir porque isWatchingVideo()
+    // so enxerga <video> nativo: iframe nao expoe .paused/.muted.
+    const chatVimeoState = new Map();
+
+    function embedVimeo(videoId, ratioPct) {
+      const id = 'vim-' + Math.random().toString(36).slice(2);
+
+      // controls=0 mata a barra de progresso, o botao de pular e a tela cheia.
+      // title/byline/portrait=0 tiram a tarja do autor em cima do video.
+      // pip=0 e keyboard=0 tiram picture-in-picture e atalhos de teclado.
+      const params = [
+        'autoplay=1', 'muted=1', 'loop=0', 'autopause=0', 'controls=0',
+        'title=0', 'byline=0', 'portrait=0', 'badge=0',
+        'pip=0', 'keyboard=0', 'playsinline=1'
+      ].join('&');
+
+      bubble(`
+        <div class="msg-media chat-video-wrapper" id="${id}-wrap">
+          <div class="chat-video-ratio" style="padding-top:${ratioPct}%">
+            <iframe id="${id}"
+              src="https://player.vimeo.com/video/${videoId}?${params}"
+              frameborder="0"
+              allow="autoplay; encrypted-media"
+              referrerpolicy="strict-origin-when-cross-origin"
+              title="video"></iframe>
+          </div>
+          <div class="chat-video-overlay is-loading" id="${id}-overlay">
+            <div class="chat-video-overlay-content">
+              <div class="chat-video-spinner"></div>
+              <svg viewBox="0 0 24 24" class="pulse-icon"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <div class="chat-video-overlay-text">Carregando...</div>
+            </div>
+          </div>
+          <div class="chat-video-hitbox" id="${id}-hitbox"></div>
+        </div>
+      `);
+
+      setupChatVimeo(id);
+    }
+
+    function setupChatVimeo(id) {
+      const iframe  = document.getElementById(id);
+      const overlay = document.getElementById(id + '-overlay');
+      const hitbox  = document.getElementById(id + '-hitbox');
+      const wrap    = document.getElementById(id + '-wrap');
+      if (!iframe) return;
+
+      const textEl = overlay.querySelector('.chat-video-overlay-text');
+      const state  = { playing: false, muted: true };
+      chatVimeoState.set(id, state);
+
+      let player = null;
+      let revealed = false;   // ja liberou o "toque pra ativar o som"?
+      let hasStarted = false; // ja esta assistindo com som?
+
+      // O aviso so aparece quando da pra realmente tocar. Antes disso fica
+      // "Carregando...", senao a pessoa toca, nada acontece, e acha que travou.
+      function reveal() {
+        if (revealed) return;
+        revealed = true;
+        overlay.classList.remove('is-loading');
+        textEl.textContent = 'Toque para ativar o som';
+      }
+
+      function boot(tentativas) {
+        if (!window.Vimeo || !window.Vimeo.Player) {
+          if (tentativas > 60) { reveal(); return; }   // API nao veio: libera assim mesmo
+          setTimeout(function () { boot(tentativas + 1); }, 100);
+          return;
+        }
+
+        player = new Vimeo.Player(iframe);
+
+        player.setVolume(0).catch(function () {});
+        player.play().catch(function () {});
+
+        // Se a rede engasgar no meio, volta o "carregando" em vez de deixar
+        // a pessoa olhando pra imagem parada achando que quebrou de novo.
+        player.on('bufferstart', function () {
+          if (!hasStarted) return;
+          overlay.classList.add('is-loading');
+          textEl.textContent = 'Carregando...';
+          overlay.style.display = 'flex';
+          overlay.style.opacity = '1';
+        });
+
+        player.on('bufferend', function () {
+          if (!hasStarted) return;
+          overlay.style.opacity = '0';
+          setTimeout(function () { overlay.style.display = 'none'; }, 300);
+        });
+
+        player.on('play',  function () { state.playing = true;  });
+        player.on('pause', function () { state.playing = false; });
+        player.on('playing', reveal);
+        player.on('timeupdate', function (d) { if (d && d.seconds > 0) reveal(); });
+
+        // Fim do video: o overlay entra por cima ANTES do Vimeo desenhar a
+        // tela de "mais videos", e o video volta pro zero. Assim nunca
+        // aparece sugestao de sair da pagina.
+        player.on('ended', function () {
+          hasStarted = false;
+          state.playing = false;
+          hitbox.style.display = 'none';
+          overlay.classList.remove('is-loading');
+          textEl.textContent = 'Toque para reassistir';
+          overlay.style.display = 'flex';
+          setTimeout(function () { overlay.style.opacity = '1'; }, 20);
+          player.setCurrentTime(0).catch(function () {});
+          player.pause().catch(function () {});
+        });
+
+        player.on('error', reveal);
+
+        // Rede muito lenta: nao deixa a pessoa presa no "carregando" pra
+        // sempre, porque o proprio toque tambem da play.
+        player.ready()
+          .then(function () { setTimeout(reveal, 2500); })
+          .catch(reveal);
+      }
+
+      boot(0);
+
+      overlay.addEventListener('click', function () {
+        if (!revealed || !player) return;
+
+        // Toque = comeca do zero, com som.
+        player.setCurrentTime(0).catch(function () {});
+        player.setVolume(1).catch(function () {});
+        player.play().catch(function () {});
+        state.muted = false;
+        state.playing = true;
+
+        // A partir daqui a pessoa esta assistindo: enquadra o video na tela
+        // e solta o chat do fim, pra mensagem nova nao puxar a visao embora.
+        stickToBottom = false;
+        if (wrap) {
+          autoScrolling = true;
+          wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(function () { autoScrolling = false; }, 500);
+        }
+
+        overlay.style.opacity = '0';
+        setTimeout(function () {
+          overlay.style.display = 'none';
+          hitbox.style.display = 'block';
+          hasStarted = true;
+        }, 300);
+      });
+
+      hitbox.addEventListener('click', function () {
+        if (!hasStarted || !player) return;
+        player.getPaused().then(function (paused) {
+          if (paused) player.play().catch(function () {});
+          else player.pause().catch(function () {});
+        }).catch(function () {});
+      });
     }
 
     function setupChatVideo(id) {
@@ -1416,14 +1623,14 @@ function embedVideoHTML(url) {
       await say('Vou te enviar mais informações');
       await say('Esse é o Xit Mobile Pro');
 
-      await showWithTyping(() => embedVideo('https://i.imgur.com/hwUFVCL.mp4'));
+      await showWithTyping(() => embedVideo('https://vimeo.com/1221494923', { ratio: 46.21 }));
       await wait(5000);
 
       await say('Ele tem várias funções e você usar em apostado e na ranqueada');
 
       await say('Se liga nesse clip que eu tava jogando na minha conta principal 👇');
 
-      await showWithTyping(() => embedVideo('https://i.imgur.com/oA1x26Q.mp4'));
+      await showWithTyping(() => embedVideo('https://vimeo.com/1221494578', { ratio: 177.59 }));
       trackCustom('assistiu 2° video');
       await wait(7000);
 
