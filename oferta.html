@@ -9,12 +9,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
 
-  <!-- Utmify: UTMs -->
+  <!-- ================= RASTREAMENTO — UTMify ================= -->
+  <!-- 1. Script de UTMs -->
   <script src="https://cdn.utmify.com.br/scripts/utms/latest.js"
           data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
 
-  <!-- Utmify: pixel. O pixelId precisa existir antes do script carregar,
-       por isso os dois ficam juntos e nesta ordem. -->
+  <!-- 2. Pixel da UTMify.
+       O pixelId precisa existir ANTES do script carregar, por isso os dois
+       ficam juntos e nesta ordem. Fica no <head> (nao no <body>) pra carregar
+       o quanto antes. -->
   <script>
     window.pixelId = "6a8331f816fe7033bc1acbf7";
     var a = document.createElement("script");
@@ -22,6 +25,196 @@
     a.setAttribute("defer", "");
     a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
     document.head.appendChild(a);
+  </script>
+
+  <!-- 3. Lead Stitching — costura o _id do lead da UTMify dentro do utm_source
+       (vira FBjLj<id>), casando a VENDA no checkout com a VISITA (fbp/fbc).
+       PRE-REQUISITO: o link do anuncio precisa chegar com utm_source=FB
+       (exatamente "FB" — nao "facebook", nao "MetaAds"). -->
+  <script>
+  (function () {
+    var POLL_MS = 500, MAX_ATTEMPTS = 40;
+    function getStorageKey() {
+      var c = new URL(window.location.href).searchParams.get("utm_source");
+      if (c === "FB") return "lead";
+      if (c === "google") return "lead-google";
+      return null;
+    }
+    function getLeadId(k) {
+      if (!k) return null;
+      try {
+        var raw = localStorage.getItem(k);
+        if (!raw) return null;
+        var o = JSON.parse(raw);
+        return o && o._id ? String(o._id) : null;
+      } catch (e) { return null; }
+    }
+    function applyUtmIfNeeded() {
+      var url = new URL(window.location.href);
+      var c = url.searchParams.get("utm_source");
+      var id = getLeadId(getStorageKey());
+      if (!id) return false;
+      var desired = null;
+      if (c === "FB") desired = "FBjLj" + id;
+      else if (c === "google") desired = "googlejLj" + id;
+      if (!desired) return false;
+      url.searchParams.set("utm_source", desired);
+      window.location.replace(url.toString());
+      return true;
+    }
+    if (applyUtmIfNeeded()) return;
+    var n = 0;
+    var iv = setInterval(function () {
+      n++;
+      if (applyUtmIfNeeded() || getStorageKey() === null || n >= MAX_ATTEMPTS) clearInterval(iv);
+    }, POLL_MS);
+  })();
+  </script>
+
+  <!-- 4. Tracker: captura de UTM, event_id e eventos -->
+  <script>
+  (function () {
+    var STORAGE_KEY = 'ff_utm_tracker';
+    var PRODUTOS = [
+      { match: /6dBdfGaUIDnxnuVKvXJ6|permanente|vitalic/i, nome: 'XIT MOBILE PRO PERMANENTE', valor: 18.42 },
+      { match: /H7y54DQy27rXtq9LvA65|30\s*dias|mensal/i,   nome: 'XIT MOBILE PRO - 30 DIAS',  valor: 11.04 }
+    ];
+    var VALOR_PADRAO = 11.04;
+
+    var trackingKeys = [
+      'utm_source','utm_medium','utm_campaign','utm_content','utm_term',
+      'src','sck','xcod','fbclid','gclid','ttclid','msclkid','irclickid','utm_id'
+    ];
+
+    /* ---- Captura e persiste as UTMs (sobrevive a recarga e navegacao) ---- */
+    var urlParams = new URLSearchParams(window.location.search);
+    var atual = {}, temNaUrl = false;
+    trackingKeys.forEach(function (k) {
+      var v = urlParams.get(k);
+      if (v) { atual[k] = v; temNaUrl = true; }
+    });
+
+    var salvo = {};
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
+      if (raw) salvo = JSON.parse(raw);
+    } catch (e) {}
+
+    var merged;
+    if (temNaUrl) {
+      merged = Object.assign({}, salvo, atual);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      } catch (e) {}
+    } else {
+      merged = salvo;
+    }
+
+    /* ---- Fallback organico: quem chega sem UTM nao vira "sem origem" ---- */
+    if (!merged['utm_source'] && !merged['src']) {
+      var ref = document.referrer, host = '';
+      if (ref) { try { host = new URL(ref).hostname; } catch (err) {} }
+      if (host) {
+        if (host.indexOf('google') !== -1)         merged['utm_source'] = 'organic_google';
+        else if (host.indexOf('facebook') !== -1)  merged['utm_source'] = 'organic_facebook';
+        else if (host.indexOf('instagram') !== -1) merged['utm_source'] = 'organic_instagram';
+        else if (host.indexOf('tiktok') !== -1)    merged['utm_source'] = 'organic_tiktok';
+        else merged['utm_source'] = 'referrer_' + host.replace(/\./g, '_');
+        merged['utm_medium'] = 'organic';
+      }
+    }
+
+    window.getMergedTrackingParams = function () { return merged; };
+
+    /* ---- event_id unico por clique (dedup IC x Purchase server-side) ---- */
+    window.generateEventId = function () {
+      try {
+        if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+          return window.crypto.randomUUID();
+        }
+      } catch (e) {}
+      return 'evt-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+    };
+
+    /* ---- Decora qualquer URL com as UTMs + event_id ---- */
+    window.decorateUrlWithTracking = function (rawUrl, eventId) {
+      try {
+        var u = new URL(rawUrl, window.location.href);
+        var p = window.getMergedTrackingParams();
+        for (var k in p) { if (p.hasOwnProperty(k) && p[k]) u.searchParams.set(k, p[k]); }
+        if (eventId) u.searchParams.set('event_id', eventId);
+        return u.toString();
+      } catch (e) { return rawUrl; }
+    };
+
+    /* ---- Eventos PADRAO: nunca chamamos fbq aqui ----
+       O pixel da UTMify ja dispara o fbq (browser) + CAPI (server) com
+       deduplicacao. Chamar fbq de novo geraria evento DOBRADO. */
+    window.trackEvent = function (nome, params, eventID) {
+      if (window.ttq && typeof window.ttq.track === 'function') window.ttq.track(nome, params);
+      if (typeof window.gtag === 'function') window.gtag('event', nome, params);
+      console.log('[TRACKING]', nome, params, eventID ? '(eventID: ' + eventID + ')' : '');
+    };
+
+    /* ---- Eventos CUSTOMIZADOS (funil interno) ----
+       Esses a UTMify nao dispara, entao vao por fbq se ele existir.
+       Sem base code do Meta na pagina, fbq so existe se o pixel da UTMify
+       o expuser — por isso o teste antes, em vez do try/catch cego. */
+    window.trackCustomEvent = function (nome) {
+      if (typeof window.fbq === 'function') window.fbq('trackCustom', nome);
+      if (window.ttq && typeof window.ttq.track === 'function') window.ttq.track(nome);
+      console.log('[TRACKING CUSTOM]', nome);
+    };
+
+    /* ---- ViewContent ---- */
+    function viewContent() {
+      window.trackEvent('ViewContent', {
+        content_name: document.title, content_type: 'product', currency: 'BRL'
+      });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', viewContent);
+    } else { viewContent(); }
+
+    /* ---- Interceptador de cliques no checkout (ggcheckout) ---- */
+    var CHECKOUT_HOSTS = ['ggcheckout', 'tribopay', 'zeroone', 'pay.', 'checkout.'];
+    function isCheckoutLink(href) {
+      if (!href) return false;
+      var h = href.toLowerCase();
+      for (var i = 0; i < CHECKOUT_HOSTS.length; i++) {
+        if (h.indexOf(CHECKOUT_HOSTS[i]) !== -1) return true;
+      }
+      return false;
+    }
+    document.addEventListener('click', function (e) {
+      var link = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (!link) return;
+      var href = link.getAttribute('href') || '';
+      if (!isCheckoutLink(href)) return;
+
+      e.preventDefault();
+
+      var alvo = (href + ' ' + (link.textContent || '')).toLowerCase();
+      var nome = 'XIT MOBILE PRO', valor = VALOR_PADRAO;
+      for (var i = 0; i < PRODUTOS.length; i++) {
+        if (PRODUTOS[i].match.test(alvo)) { nome = PRODUTOS[i].nome; valor = PRODUTOS[i].valor; break; }
+      }
+
+      var eventId = window.generateEventId();
+      window.trackEvent('InitiateCheckout', {
+        value: valor, currency: 'BRL', content_name: nome, content_type: 'product'
+      }, eventId);
+
+      var destino = window.decorateUrlWithTracking(href, eventId);
+      setTimeout(function () { window.location.href = destino; }, 800);
+    }, true);
+
+    /* ---- Purchase NUNCA dispara no front ----
+       A venda so existe quando o PIX e pago, fora do site. O Purchase vem
+       server-side, do webhook "venda aprovada" -> CAPI/UTMify, reaproveitando
+       o event_id anexado na URL do checkout. */
+  })();
   </script>
 
   <style>
