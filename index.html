@@ -1230,10 +1230,68 @@ function embedVideoHTML(url) {
       });
     }
     function playNew() { try { sfxNew.currentTime = 0; sfxNew.play(); } catch (e) {} }
-    function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+    // ===== MEMORIA DO CHAT =====
+    // Quem vai pra oferta e volta nao pode ser obrigado a esperar a conversa
+    // inteira de novo - e ai que a pessoa desiste. Guardamos ate onde ela
+    // chegou; na volta, tudo que ela ja viu reaparece na hora e o fluxo
+    // retoma no ritmo normal a partir dali.
+    //
+    // sessionStorage de proposito: vale enquanto a aba estiver aberta. Quem
+    // voltar dias depois pelo remarketing ve a conversa acontecendo ao vivo,
+    // que e o que faz a pagina funcionar.
+    const CHAT_MEM_KEY = 'almaz_chat_progresso';
+    const CHAT_MEM_VALIDADE = 45 * 60 * 1000; // 45 min
+
+    let passoAtual = 0;      // em qual passo o fluxo esta agora
+    let passosVistos = 0;    // ate onde a pessoa ja tinha visto
+    let escolhaSalva = null; // Android / iPhone
+    let tracksEnviados = []; // eventos de funil ja disparados nesta sessao
+
+    (function carregarMemoria() {
+      try {
+        var raw = sessionStorage.getItem(CHAT_MEM_KEY);
+        if (!raw) return;
+        var m = JSON.parse(raw);
+        if (!m || !m.quando || (Date.now() - m.quando) > CHAT_MEM_VALIDADE) {
+          sessionStorage.removeItem(CHAT_MEM_KEY);
+          return;
+        }
+        passosVistos   = m.passos || 0;
+        escolhaSalva   = m.escolha || null;
+        tracksEnviados = m.tracks || [];
+      } catch (e) { /* storage bloqueado: segue como visita nova */ }
+    })();
+
+    function salvarMemoria() {
+      try {
+        sessionStorage.setItem(CHAT_MEM_KEY, JSON.stringify({
+          passos: passoAtual,
+          escolha: escolhaSalva,
+          tracks: tracksEnviados,
+          quando: Date.now()
+        }));
+      } catch (e) { /* storage cheio ou bloqueado: o chat so nao lembra */ }
+    }
+
+    // Enquanto isso for verdade, estamos refazendo o que ela ja viu:
+    // sem "digitando...", sem pausa, sem autoplay de video.
+    function refazendo() { return passoAtual <= passosVistos; }
+
+    function wait(ms) {
+      // No replay nao ha espera: o que ela ja viu volta na hora.
+      if (refazendo()) return Promise.resolve();
+      return new Promise(r => setTimeout(r, ms));
+    }
     // Antes: try { fbq(...) } catch {} — o fbq nunca era carregado nesta pagina,
     // entao TODOS os eventos do funil morriam em silencio dentro do catch.
-    function trackCustom(name) { window.trackCustomEvent(name); }
+    function trackCustom(name) {
+      // Marco de funil dispara uma vez por sessao. Sem isso, quem volta
+      // da oferta refaz o fluxo e reenvia tudo, inflando o relatorio.
+      if (tracksEnviados.indexOf(name) !== -1) return;
+      tracksEnviados.push(name);
+      salvarMemoria();
+      window.trackCustomEvent(name);
+    }
     // Antes so repassava location.search. Agora leva as UTMs mescladas
     // (incluindo as que vieram de uma visita anterior) e o fallback organico.
     function redirectPreserveQS(base) {
@@ -1293,6 +1351,20 @@ function embedVideoHTML(url) {
     }
 
     function choices(items) {
+      // Ja respondeu nesta sessao: repoe a resposta dela e segue o fluxo,
+      // em vez de perguntar a mesma coisa de novo.
+      if (escolhaSalva) {
+        var jaEscolhido = null;
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].label === escolhaSalva) { jaEscolhido = items[i]; break; }
+        }
+        if (jaEscolhido) {
+          bubble(jaEscolhido.label, { host: false });
+          jaEscolhido.onClick();
+          return;
+        }
+      }
+
       const row = document.createElement('div');
       row.className = 'row host';
       const inner = document.createElement('div');
@@ -1311,6 +1383,8 @@ function embedVideoHTML(url) {
         btn.onclick = async () => {
           row.remove();
           bubble(it.label, { host: false });
+          escolhaSalva = it.label;
+          salvarMemoria();
           await it.onClick();
         };
         box.appendChild(btn);
@@ -1357,12 +1431,18 @@ function embedVideoHTML(url) {
     }
 
     async function showWithTyping(action, delay) {
+      passoAtual++;
+
+      // Passo que ela ja viu: entra direto, sem 'digitando' e sem pausa.
+      if (passoAtual <= passosVistos) { action(); return; }
+
       setStatus('digitando...');
       const tip = showTypingBubble();
       await wait(delay ?? jitter(1500));
       tip.remove();
       setStatus('Online');
       action();
+      salvarMemoria();
     }
 
     // Fala uma mensagem com tempo de "digitando" e leitura proporcionais ao texto,
@@ -1430,8 +1510,14 @@ function embedVideoHTML(url) {
       // controls=0 mata a barra de progresso, o botao de pular e a tela cheia.
       // title/byline/portrait=0 tiram a tarja do autor em cima do video.
       // pip=0 e keyboard=0 tiram picture-in-picture e atalhos de teclado.
+      // Refazendo a conversa: o video entra PARADO. Dois players do Vimeo
+      // dando autoplay juntos seria o mesmo peso que derrubou os mp4.
+      const semAutoplay = refazendo();
+
       const params = [
-        'autoplay=1', 'muted=1', 'loop=0', 'autopause=0', 'controls=0',
+        semAutoplay ? 'autoplay=0' : 'autoplay=1',
+        semAutoplay ? 'muted=0' : 'muted=1',
+        'loop=0', 'autopause=0', 'controls=0',
         'title=0', 'byline=0', 'portrait=0', 'badge=0',
         'pip=0', 'keyboard=0', 'playsinline=1'
       ].join('&');
@@ -1457,10 +1543,10 @@ function embedVideoHTML(url) {
         </div>
       `);
 
-      setupChatVimeo(id);
+      setupChatVimeo(id, semAutoplay);
     }
 
-    function setupChatVimeo(id) {
+    function setupChatVimeo(id, semAutoplay) {
       const iframe  = document.getElementById(id);
       const overlay = document.getElementById(id + '-overlay');
       const hitbox  = document.getElementById(id + '-hitbox');
@@ -1481,7 +1567,7 @@ function embedVideoHTML(url) {
         if (revealed) return;
         revealed = true;
         overlay.classList.remove('is-loading');
-        textEl.textContent = 'Toque para ativar o som';
+        textEl.textContent = semAutoplay ? 'Toque para assistir' : 'Toque para ativar o som';
       }
 
       function boot(tentativas) {
@@ -1493,8 +1579,14 @@ function embedVideoHTML(url) {
 
         player = new Vimeo.Player(iframe);
 
-        player.setVolume(0).catch(function () {});
-        player.play().catch(function () {});
+        if (semAutoplay) {
+          // Fica no poster esperando o toque. O clique no overlay ja faz
+          // setCurrentTime(0) + volume + play, entao comeca do zero com som.
+          reveal();
+        } else {
+          player.setVolume(0).catch(function () {});
+          player.play().catch(function () {});
+        }
 
         // Se a rede engasgar no meio, volta o "carregando" em vez de deixar
         // a pessoa olhando pra imagem parada achando que quebrou de novo.
