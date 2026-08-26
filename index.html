@@ -441,7 +441,10 @@
       width: min(240px, 58vw);
     }
 
-    .chat-video-ratio iframe {
+    /* Especificidade maior de proposito: .msg-media iframe tem min-height
+       (280px na base, 200px no mobile) e empata em especificidade com
+       .chat-video-ratio iframe, ganhando por vir depois no arquivo. */
+    .chat-video-wrapper .chat-video-ratio iframe {
       position: absolute;
       top: 0;
       left: 0;
