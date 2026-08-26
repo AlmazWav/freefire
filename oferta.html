@@ -1110,6 +1110,156 @@
       font-style: italic;
     }
 
+    /* ===== FEEDBACK EM VIDEO =====
+       Os 3 depoimentos sao verticais (9:16). No desktop ficam lado a lado;
+       no celular viram carrossel, porque 3 videos em pe empilhados dariam
+       uma pagina quilometrica e ninguem rolaria ate o fim.
+
+       Nada de iframe carregado de cara: 3 players do Vimeo de uma vez
+       pesariam como os mp4 antigos. Aqui entra a capa (thumb do proprio
+       Vimeo) e o player so nasce no toque. */
+    .vfeedback-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+      margin-top: 40px;
+    }
+
+    .vfeedback-card {
+      position: relative;
+      aspect-ratio: 9 / 16;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #0c0505;
+      border: 1px solid var(--border-subtle);
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    @supports not (aspect-ratio: 9 / 16) {
+      .vfeedback-card { height: 0; padding-top: 177.78%; }
+    }
+
+    .vfeedback-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border);
+      box-shadow: 0 0 30px rgba(225,29,72,0.22);
+    }
+
+    .vfeedback-card.is-playing {
+      border-color: rgba(225,29,72,0.55);
+      box-shadow: 0 0 34px rgba(225,29,72,0.32);
+      transform: none;
+    }
+
+    .vfeedback-stage,
+    .vfeedback-cover {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .vfeedback-stage iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    /* A capa e um botao de verdade: da pra chegar nela pelo teclado. */
+    .vfeedback-cover {
+      display: block;
+      padding: 0;
+      border: 0;
+      background: none;
+      cursor: pointer;
+      z-index: 2;
+      transition: opacity 0.35s ease;
+    }
+
+    .vfeedback-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Escurece a base pra estrela e duracao ficarem legiveis em qualquer frame. */
+    .vfeedback-cover::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 38%, rgba(0,0,0,0.78) 100%);
+    }
+
+    .vfeedback-play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e11d48 0%, #9f1239 100%);
+      box-shadow: 0 10px 30px rgba(225,29,72,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
+      animation: vfeedbackPulse 2.4s ease-in-out infinite;
+    }
+
+    .vfeedback-play svg {
+      width: 24px;
+      height: 24px;
+      fill: #fff;
+      margin-left: 3px; /* o triangulo optico nunca senta no centro real */
+    }
+
+    @keyframes vfeedbackPulse {
+      0%, 100% { box-shadow: 0 10px 30px rgba(225,29,72,0.45); }
+      50%      { box-shadow: 0 10px 38px rgba(225,29,72,0.68); }
+    }
+
+    .vfeedback-cover:hover .vfeedback-play { transform: translate(-50%, -50%) scale(1.07); }
+
+    .vfeedback-meta {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 13px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .vfeedback-stars {
+      color: var(--gold);
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+    }
+
+    .vfeedback-dur {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 999px;
+      padding: 3px 9px;
+      letter-spacing: 0.02em;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .vfeedback-play { animation: none; }
+      .vfeedback-card:hover { transform: none; }
+    }
+
     /* ===== STEPS ===== */
     .steps-section {
       background: linear-gradient(180deg, var(--bg) 0%, #080303 50%, var(--bg) 100%);
@@ -1671,6 +1821,33 @@
       .testimonials-grid { grid-template-columns: 1fr; gap: 16px; }
       .feature-card { padding: 24px 20px; }
       .testimonial-card { padding: 24px 20px; }
+
+      /* Carrossel no celular: 3 videos em pe empilhados viram uma pagina
+         sem fim. O card cortado na borda direita e de proposito, e a dica
+         visual de que da pra arrastar. */
+      .vfeedback-grid {
+        grid-template-columns: none;
+        grid-auto-flow: column;
+        grid-auto-columns: 68%;
+        gap: 14px;
+        margin-top: 28px;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 4px 20px 10px;
+        margin-left: -20px;
+        margin-right: -20px;
+      }
+
+      .vfeedback-grid::-webkit-scrollbar { display: none; }
+
+      .vfeedback-card { scroll-snap-align: center; }
+      .vfeedback-card:hover { transform: none; }
+
+      .vfeedback-play { width: 54px; height: 54px; }
+      .vfeedback-play svg { width: 21px; height: 21px; }
       .pricing-body { padding: 24px 16px; }
       .price-current { font-size: 36px; }
       .hero-logo { width: 90px; height: 90px; }
@@ -2366,33 +2543,47 @@
     <div class="container">
       <h2 class="section-title reveal">O Que Muda no Seu Jogo</h2>
       <p class="section-subtitle reveal">Relatos de quem já está amassando com o Xit Mobile LegitAlmaz</p>
-      <div class="testimonials-grid">
-        <div class="testimonial-card reveal">
-          <div class="testimonial-header">
-            <div class="testimonial-avatar"><img src="images/logo.png" alt="LegitAlmaz"></div>
-            <div>
-              <div class="testimonial-name">OliverRlk</div>
-            </div>
-          </div>
-          <p class="testimonial-text">"O Xit é muito brabo, jogo ranqueada o dia todo e sem disfarçar kkkk tá absurdo farmando nos AP"</p>
+      <div class="vfeedback-grid">
+        <div class="vfeedback-card reveal" data-vimeo="1130190842">
+          <div class="vfeedback-stage"></div>
+          <button class="vfeedback-cover" type="button" aria-label="Assistir feedback em video (21 segundos)">
+            <img src="https://i.vimeocdn.com/video/2073794567-c4c9f5887d2e8283e73aa8cc94fdd292b07d854b0fa572316add277406d529e7-d_480x854" alt="" width="480" height="854" loading="lazy" decoding="async">
+            <span class="vfeedback-play">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+            </span>
+            <span class="vfeedback-meta">
+              <span class="vfeedback-stars" aria-label="5 estrelas">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+              <span class="vfeedback-dur">0:21</span>
+            </span>
+          </button>
         </div>
-        <div class="testimonial-card reveal">
-          <div class="testimonial-header">
-            <div class="testimonial-avatar"><img src="images/logo.png" alt="LegitAlmaz"></div>
-            <div>
-              <div class="testimonial-name">Jonas Silva</div>
-            </div>
-          </div>
-          <p class="testimonial-text">"Uso a config de puxar mais fraco pra disfarçar no apostado os caras nem pede tela."</p>
+
+        <div class="vfeedback-card reveal" data-vimeo="1130190915">
+          <div class="vfeedback-stage"></div>
+          <button class="vfeedback-cover" type="button" aria-label="Assistir feedback em video (27 segundos)">
+            <img src="https://i.vimeocdn.com/video/2073794654-c805dcb3ea1460b588c3dce88c8473f39686b52cfb7f821c1f60fadeeae280c1-d_480x854" alt="" width="480" height="854" loading="lazy" decoding="async">
+            <span class="vfeedback-play">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+            </span>
+            <span class="vfeedback-meta">
+              <span class="vfeedback-stars" aria-label="5 estrelas">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+              <span class="vfeedback-dur">0:27</span>
+            </span>
+          </button>
         </div>
-        <div class="testimonial-card reveal">
-          <div class="testimonial-header">
-            <div class="testimonial-avatar"><img src="images/logo.png" alt="LegitAlmaz"></div>
-            <div>
-              <div class="testimonial-name">SeniorThx</div>
-            </div>
-          </div>
-          <p class="testimonial-text">"Esse painel é outro nível, não igual aqueles q fala que é hack e manda um auxilio... Esse painel da LegitAlmaz e o melhor sem duvidas "</p>
+
+        <div class="vfeedback-card reveal" data-vimeo="1130190789">
+          <div class="vfeedback-stage"></div>
+          <button class="vfeedback-cover" type="button" aria-label="Assistir feedback em video (19 segundos)">
+            <img src="https://i.vimeocdn.com/video/2073794499-1713f6853b5cf6f171e1add3294d3495b061ffd8a4da9cffa76d968c53852ab4-d_480x854" alt="" width="480" height="854" loading="lazy" decoding="async">
+            <span class="vfeedback-play">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+            </span>
+            <span class="vfeedback-meta">
+              <span class="vfeedback-stars" aria-label="5 estrelas">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+              <span class="vfeedback-dur">0:19</span>
+            </span>
+          </button>
         </div>
       </div>
     </div>
@@ -2759,6 +2950,87 @@
         }
       });
     });
+  </script>
+
+  <script>
+  /* ===== FEEDBACK EM VIDEO (Vimeo) =====
+     A capa vira player so no toque. Isso evita 3 iframes carregando junto,
+     e como o toque e um gesto de verdade, o video ja pode comecar COM SOM.
+
+     Quando acaba, o iframe e destruido e a capa volta: alem de nao sobrar
+     player parado na memoria, e o que impede a tela de "mais videos" do
+     Vimeo de aparecer e levar a pessoa pra fora da pagina. */
+  (function () {
+    var cards = document.querySelectorAll('.vfeedback-card');
+    if (!cards.length) return;
+
+    var tocandoAgora = null;   // so um feedback toca por vez
+
+    function fechar(card) {
+      if (!card) return;
+      var stage = card.querySelector('.vfeedback-stage');
+      var cover = card.querySelector('.vfeedback-cover');
+      if (card._player && card._player.unload) { try { card._player.unload(); } catch (e) {} }
+      card._player = null;
+      stage.innerHTML = '';
+      card.classList.remove('is-playing');
+      cover.style.display = '';
+      cover.style.opacity = '';
+      if (tocandoAgora === card) tocandoAgora = null;
+    }
+
+    function abrir(card) {
+      var id = card.getAttribute('data-vimeo');
+      if (!id || card._player) return;
+
+      if (tocandoAgora && tocandoAgora !== card) fechar(tocandoAgora);
+      tocandoAgora = card;
+
+      var stage = card.querySelector('.vfeedback-stage');
+      var cover = card.querySelector('.vfeedback-cover');
+
+      // Mesmos cortes do chat: sem barra de progresso, sem botao de pular,
+      // sem tela cheia, sem tarja do autor.
+      var params = [
+        'autoplay=1', 'muted=0', 'loop=0', 'autopause=1', 'controls=0',
+        'title=0', 'byline=0', 'portrait=0', 'badge=0',
+        'pip=0', 'keyboard=0', 'playsinline=1'
+      ].join('&');
+
+      var ifr = document.createElement('iframe');
+      ifr.src = 'https://player.vimeo.com/video/' + id + '?' + params;
+      ifr.setAttribute('frameborder', '0');
+      ifr.setAttribute('allow', 'autoplay; encrypted-media');
+      ifr.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      ifr.setAttribute('title', 'Feedback em video');
+      stage.appendChild(ifr);
+
+      card.classList.add('is-playing');
+      cover.style.opacity = '0';
+      setTimeout(function () { if (card.classList.contains('is-playing')) cover.style.display = 'none'; }, 350);
+
+      if (window.Vimeo && window.Vimeo.Player) {
+        var p = new Vimeo.Player(ifr);
+        card._player = p;
+        p.setVolume(1).catch(function () {});
+        p.on('ended', function () { fechar(card); });
+        p.on('error', function () { fechar(card); });
+      }
+    }
+
+    Array.prototype.forEach.call(cards, function (card) {
+      card.querySelector('.vfeedback-cover').addEventListener('click', function () { abrir(card); });
+
+      // Tocando: um toque no card pausa/retoma, ja que nao ha controles.
+      card.addEventListener('click', function (ev) {
+        if (!card._player || ev.target.closest('.vfeedback-cover')) return;
+        card._player.getPaused().then(function (pausado) {
+          if (pausado) card._player.play().catch(function () {});
+          else card._player.pause().catch(function () {});
+        }).catch(function () {});
+      });
+    });
+  })();
   </script>
 
 </body>
